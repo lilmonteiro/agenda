@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script type="text/javascript" src="script.js"></script>
+    <title>Agenda</title>
+</head>
+
+<body onload="inicia()">
+
+    <div class="window_container">
+
+        <div class="container_contatos">
+
+            <div class="contacts_bar">
+                <p>CONTACTS</p>
+                <div class="search-button-widescreen">
+                    <img src="assets/search.svg">
+                </div>
+                <input class="search-field" type="text" name=" " placeholder="Pesquisar ..." autofocus>
+                <div class="reset-btn">
+                    <div class="reset-bar1"></div>
+                    <div class="reset-bar2"></div>
+                </div>
+
+                <img src="assets/user.svg" class="contact_icon">
+            </div>
+
+            <div class="contact_list">
+            </div>
+        </div>
+
+        <div class="person_container">
+
+            <div class="search_button">
+                <img src="assets/search.svg">
+            </div>
+
+            <div class="data_container">
+                <img src="assets/profile_test.jpg" class="person_photo">
+
+                <div class="person_data">
+                    <p id="person_name" class="ellipsis">Peggy Rodriquez</p>
+                    <p>Financial Analyst</p>
+
+                    <div class="tel_container">
+                        <!-- <img src="assets/tell.svg"> -->
+                        <p class="icon-tel label-icon ellipsis">+55 11 4737-2800</p>
+                    </div>
+                    <div class="wpp_container">
+                        <!-- <img src="assets/wpp.svg"> -->
+                        <p class="icon-wpp label-icon ellipsis">+55 11 985-847-298</p>
+                    </div>
+
+                    <div class="mail_container">
+                        <!-- <img src="assets/arroba.svg"> -->
+                        <p class="icon-arroba label-icon ellipsis">peggy.rodriquez@example.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="adress_container">
+                <div class="local_container">
+                    <img src="assets/local.svg">
+                    <p>193 W Campbell Ave</p>
+                </div>
+
+                <div class="post_container">
+                    <img src="assets/post.svg">
+                    <p>93027</p>
+                </div>
+            </div>
+
+            <div id="map">
+            </div>
+
+        </div>
+    </div>
+</body>
+
+
+</html>

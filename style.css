@@ -1,0 +1,449 @@
+html {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    background-color: lightgray;
+    width: 100%;
+    height: 100%;
+    font-family: sans-serif;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 100%;
+    align-items: center;
+    justify-items: center;
+}
+
+div {
+    margin: 0;
+}
+
+p {
+    margin: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+.window_container {
+    background-color: white;
+    border-radius: 20px;
+    align-content: space-around;
+    justify-content: space-around;
+    width: 1000px;
+    max-width: 100%;
+    height: 700px;
+    max-height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: 1fr;
+    grid-gap: 1.5em;
+    padding: 1em;
+    box-sizing: border-box;
+}
+
+.container_contatos {
+    position: relative;
+    display: grid;
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 1;
+    width: 100%;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 2fr;
+    background-color: #F2F2F2;
+    overflow: hidden;
+}
+
+.contacts_bar {
+    display: grid;
+    flex-direction: row;
+    justify-content: space-between;
+    position: static;
+    grid-column: 1;
+    grid-row: 1/ span 1;
+    background-color: #8c8b8b;
+    width: 100%;
+    height: 3em;
+    align-items: center;
+    justify-items: start;
+    grid-template-columns: 1fr auto auto;
+    grid-template-rows: 100%;
+    align-items: center;
+}
+
+.contacts_bar p {
+    margin-left: 1em;
+    font-size: 1em;
+    color: white;
+    grid-column: 1 / span 1;
+    grid-row: 1;
+}
+.search_button,
+.search-button-widescreen {
+    display: block;
+    padding: 0.2em;
+    box-sizing: border-box;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.search-button-widescreen {
+    padding: 0.2em;
+    width: 2em;
+    grid-column: 3;
+    grid-row: 1;
+}
+
+.search_button {
+    position: absolute;
+    display: block;
+    background-color: #8c8b8b;
+    width: 2em;
+    right: 0;
+    padding:  0.5em;
+    cursor: pointer;
+    z-index: 2;
+    border-radius: 0 0 0 1em;
+    visibility: hidden;
+}
+
+.search_button img {
+    width: 2em;
+    /* height: 2em; */
+}
+
+.search-field {
+    position: absolute;
+    background-color: #8c8b8b;
+    display: block;
+    height: 3em;
+    z-index: 1;
+    top: 0;
+    box-sizing: border-box;
+    border-color: transparent;
+    font-size: 1em;
+    padding: 1em;
+    color: white;
+    opacity: 0;
+    grid-column: 1/ span 1;
+    grid-row: 1;
+}
+
+.search-field.active {
+    opacity: 1;
+}
+
+.reset-btn {
+    position: relative;
+    display: flex;
+    height: 2em;
+    width: 2em;
+    z-index: 1;
+    box-sizing: border-box;
+    justify-content: center;
+    padding: 0.5em;
+    cursor: pointer;
+    grid-column: 2;
+    grid-row: 1;
+    visibility: hidden;
+}
+.reset-btn.active{
+    visibility: visible;
+}
+
+.reset-bar1,
+.reset-bar2 {
+    display: flex;
+    background-color: rgb(80, 80, 80);
+    height: 100%;
+    width: 0.2em;
+}
+
+.reset-bar1 {
+    transform: rotate(45deg) translate(0.2em, -0.05em);
+}
+
+.reset-bar2 {
+    transform: rotate(-45deg) translate(-0.1em, 0.05em);
+}
+
+.contact_icon {
+    position: relative;
+    cursor: pointer;
+    height: 2em;
+    visibility: hidden;   
+}
+
+a:link {
+    color: black;
+}
+
+a:visited {
+    color: rgb(33, 33, 33);
+}
+
+a:hover {
+    color: dimgray;
+}
+
+a:active {
+    color: rgb(160, 160, 160);
+}
+
+.contact_list {
+    display: flex;
+    flex-direction: column;
+    grid-column: 1;
+    grid-row: 2/ span 1;
+    border-radius: 0 0 10px 10px;
+    width: 100%;
+    cursor: pointer;
+    overflow: scroll;
+    overflow-x: hidden;
+}
+
+.contact_list a {
+    width: 100%;
+    position: relative;
+}
+
+.contact_list a:hover {
+    background-color: rgb(177, 177, 177);
+}
+
+.contact_list a:active {
+    background-color: white;
+}
+
+.contact_list p,
+.contact_name p {
+    padding: 1em;
+    padding: 1em;
+    margin: 0;
+}
+
+.contact_initial {
+    display: flex;
+    position: absolute;
+    background-image: url(assets/initial_bg.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 30px;
+    left: 1em;
+    color: white;
+}
+
+.contact_name {
+    display: flex;
+    position: relative;
+    left: 50px;
+}
+
+.ellipsis {
+    width: 85%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.person_container {
+    display: grid;
+    position: relative;
+    grid-column: 2;
+    grid-row: 1;
+    background-color: #F2F2F2;
+    border-radius: 10px;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr;
+    padding: 1em;
+    grid-gap: 2em;
+}
+
+.data_container {
+    display: grid;
+    position: relative;
+    grid-column: 1;
+    grid-row: 1/ span 1;
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: 1fr;
+}
+
+.person_photo {
+    border-radius: 50%;
+    border-style: solid;
+    border-color: white;
+    border-width: 5px;
+    border: 5px solid white;
+    justify-self: end;
+    width: auto
+}
+
+.person_data {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    top: 0;
+    bottom: 0;
+    align-self: center;
+    justify-self: start;
+    margin-left: 1em;
+    font-size: 1em;
+    word-wrap: break-word;
+}
+
+#person_name {
+    font-size: 1.5em;
+    font-weight: 800;
+    word-wrap: break-word;
+}
+
+.tel_container,
+.wpp_container,
+.mail_container {
+    display: flex;
+    flex-direction: row;
+    justify-self: start;
+}
+
+.icon-tel {
+    --my-icon: url('assets/tell.svg');
+}
+
+.icon-wpp {
+    --my-icon: url('assets/wpp.svg');
+}
+
+.icon-arroba {
+    --my-icon: url('assets/arroba.svg');
+}
+
+.label-icon:before {
+    content: "";
+    background-image: var(--my-icon);
+    background-repeat: no-repeat;
+    background-position: center center;
+    align-self: center;
+    float: left;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    top: .05em;
+    position: relative;
+    margin-right: .5em;
+}
+
+.tel_container p:nth-of-type(1) {
+    font-size: 1em;
+}
+
+.adress_container {
+    grid-column: 1;
+    grid-row: 2;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+
+.adress_container img {
+    width: 1.5em;
+}
+
+.local_container,
+.post_container {
+    display: flex;
+    flex-direction: row;
+}
+
+.local_container {
+    justify-content: flex-start;
+}
+
+.post_container {
+    justify-content: flex-end;
+}
+
+.local_container p,
+.post_container p {
+    align-self: center;
+    margin-left: 0.2em;
+}
+
+.post_container p {
+    justify-content: flex-end;
+}
+
+#map {
+    display: grid;
+    position: relative;
+    grid-column: 1;
+    grid-row: 3;
+    height: 100%;
+    width: auto;
+}
+
+
+
+
+@media (max-width: 600px) {
+    html {
+        overflow: hidden;
+    }
+    body {
+        justify-items: unset;
+        align-items: unset;
+        overflow: hidden;
+    }
+    .window_container {
+        position: relative;
+        height: 100%;
+        max-height: unset;
+        width: 200%;
+        max-width: unset;
+        transition: left .5s ease-in-out;
+        left: -100%;
+        grid-template-columns: 1fr 1fr;
+        border-radius: unset;
+        background-color: #8c8b8b;
+    }
+    .person_container {
+        padding: 2em 1em;
+    }
+    .transition-mobile {
+        position: relative;
+        left: 0%;
+    }
+    .search_button {
+        display: block;
+        visibility: visible;
+    }
+    .contact_icon {
+        visibility: visible;
+        grid-column: 3;
+        grid-row: 1;
+        z-index: 1;
+    }
+    .search-field {
+        width: 100%;
+        border-style: solid;
+        border-width: 0.1em;
+        border-color: rgb(160, 160, 160);
+        border-radius: 1em 1em 0 0;
+        opacity: 1; 
+        grid-column: 1/ span 2;      
+    }
+    .search-field::placeholder {
+        color: #F2F2F2;
+        opacity: 0.7;
+    }
+    .search-button-widescreen {
+        display: none;
+    }
+    .reset-btn{
+        grid-column: 1/ span 1;
+        justify-self: end;
+    }
+}
