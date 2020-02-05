@@ -18,16 +18,121 @@ var inicia = function() {
     var resetBtn = document.querySelector(".reset-btn");
     resetBtn.addEventListener("click", resetEventHandler);
 
+    var editBtn = document.querySelector(".edit-icon");
+    // editableField.addEventListener("click", editEventHandler);
+    editBtn.addEventListener("click", editClickEventHandler);
+
+    var nameField = document.querySelector(".person_data p:nth-child(1)");
+    nameField.addEventListener("keydown", keydownEventHandler);
+    var ageField = document.querySelector(".person_data p:nth-child(2)");
+    ageField.addEventListener("keydown", keydownEventHandler);
+    var telField = document.querySelector(".tel_container p");
+    telField.addEventListener("keydown", keydownEventHandler);
+    var celField = document.querySelector(".wpp_container p");
+    celField.addEventListener("keydown", keydownEventHandler);
+    var emailField = document.querySelector(".mail_container p");
+    emailField.addEventListener("keydown", keydownEventHandler);
+
     requestJSON('https://randomuser.me/api/?results=100', function(obj) { // Chamando request do banco de dados//
-        userData = obj.results;        
+        userData = obj.results;
+        regExNumbers(userData); // tira a formatacao estranha nativa pra uma string só de numberos
         fillUser(userData[0]); // Puxa o primeiro usuário //
         fillContactList(userData); // Na primeira vez, puxa a lista com TODOS os contatos
-        initializeAPI();       
+        phoneMask(userData[0].phone, document.querySelector(".tel_container p")); // formata do jeito que eu quero agora
+        phoneMask(userData[0].cell, document.querySelector(".wpp_container p")); // formata do jeito que eu quero agora
+        initializeAPI();
     });
-}    
+}
 
-var initializeMap=function(){
-    console.log(1);
+var phoneMask = function(number, field) {
+    var numeroAtual = number;
+    var numeroFormatado;
+
+    var onzeNum = number.length == 11;
+    var dezNum = number.length == 10;
+    var noveNum = number.length == 9;
+    var oitoNum = number.length == 8;
+    var seteNum = number.length == 7;
+
+    if (onzeNum) {
+        const ddd = numeroAtual.slice(0, 2);
+        const parte1 = numeroAtual.slice(2, 6);
+        const parte2 = numeroAtual.slice(6);
+        numeroFormatado = "(" + ddd + ")" + " " + parte1 + "-" + parte2;
+    } else if (dezNum) {
+        const ddd = numeroAtual.slice(0, 2);
+        const parte1 = numeroAtual.slice(2, 6);
+        const parte2 = numeroAtual.slice(6);
+        numeroFormatado = "(" + ddd + ")" + " " + parte1 + "-" + parte2;
+    } else if (noveNum) {
+        const ddd = numeroAtual.slice(0, 2);
+        const parte1 = numeroAtual.slice(2, 5);
+        const parte2 = numeroAtual.slice(5);
+        numeroFormatado = "(" + ddd + ")" + " " + parte1 + "-" + parte2;
+    } else if (oitoNum) {
+        const parte1 = numeroAtual.slice(0, 4);
+        const parte2 = numeroAtual.slice(4);
+        numeroFormatado = "(XX)"+" "+parte1 + "-" + parte2;
+    } else if (seteNum) {
+        const parte1 = numeroAtual.slice(0, 3);
+        const parte2 = numeroAtual.slice(3);
+        numeroFormatado = "(XX)"+" "+parte1 + "-" + parte2;
+    } else {
+        console.log("nao tem format")
+    }
+
+    field.innerHTML = numeroFormatado;
+}
+
+var editClickEventHandler = function(event) {
+    var nameField = document.querySelector(".person_data p:nth-child(1)");
+    var ageField = document.querySelector(".person_data p:nth-child(2)");
+    var telField = document.querySelector(".tel_container p");
+    var celField = document.querySelector(".wpp_container p");
+    var emailField = document.querySelector(".mail_container p");
+
+    nameField.contentEditable = "true";
+    ageField.contentEditable = "true";
+    telField.contentEditable = "true";
+    celField.contentEditable = "true";
+    emailField.contentEditable = "true";
+
+    nameField.focus();
+}
+
+var keydownEventHandler = function(event) {
+    var nameField = document.querySelector(".person_data p:nth-child(1)");
+    var ageField = document.querySelector(".person_data p:nth-child(2)");
+    var telField = document.querySelector(".tel_container p");
+    var celField = document.querySelector(".wpp_container p");
+    var emailField = document.querySelector(".mail_container p");
+
+    var enter = event.which == 13;
+    var esc = event.which == 27;
+
+    if (enter == true) {
+        userData[0].name = event.target.innerHTML;
+        userData[0].age = event.target.innerHTML;
+        userData[0].tell = event.target.innerHTML;
+        userData[0].cell = event.target.innerHTML;
+        userData[0].email = event.target.innerHTML;
+
+        nameField.blur();
+        ageField.blur();
+        telField.blur();
+        celField.blur();
+        emailField.blur();
+    } else if (esc) {
+        document.execCommand('undo');
+        nameField.blur();
+        ageField.blur();
+        telField.blur();
+        celField.blur();
+        emailField.blur();
+    }
+}
+
+var initializeMap = function() {
     initMap(userData[0]);
 }
 
@@ -38,7 +143,7 @@ var blurEventHandler = function(event) {
     if (event.srcElement.value == "") {
         field.classList.remove("active");
     }
-    if (event==true) {
+    if (event == true) {
         resetBtn.remove("active");
     }
 }
@@ -62,18 +167,25 @@ var fillContactList = function(objs) {
     }
 }
 
-var itemClickHandler = function(itemObj, event) {      
+var regExNumbers = function(objs) {
+    for (var j = 0; j < objs.length; j++) {
+        objs[j].cell = userData[j].cell.replace(/\D/g, '');
+        objs[j].phone = userData[j].phone.replace(/\D/g, '');
+    }
+}
+
+var itemClickHandler = function(itemObj, event) {
     fillUser(itemObj)
     initMap(itemObj);
     swipeScreen(false);
-    
+
     var resetBtn = document.querySelector(".reset-btn");
     var field = document.querySelector(".search-field");
- 
-    if(event){
-    resetEventHandler();
-    resetBtn.classList.remove("active");
-    field.classList.remove("active");
+
+    if (event) {
+        resetEventHandler();
+        resetBtn.classList.remove("active");
+        field.classList.remove("active");
     }
 }
 
@@ -146,32 +258,36 @@ var eraseContactList = function() { //funcao pra limpar os contatos pra filtrar/
     }
 }
 
-var fillUser = function(userData) // funcao que puxa do JSON e preenche no HTML (parametro - base de dados)// 
-    {
-        var nameField = document.querySelector(".person_data p:nth-child(1)");
-        nameField.innerHTML = userData.name.first + " " + userData.name.last;
+var fillUser = function(userData) { // funcao que puxa do JSON e preenche no HTML (parametro - base de dados)// 
 
-        var ageField = document.querySelector(".person_data p:nth-child(2)");
-        ageField.innerHTML = userData.dob.age + " years";
+    var nameField = document.querySelector(".person_data p:nth-child(1)");
+    nameField.innerHTML = userData.name.first + " " + userData.name.last;
 
-        var telField = document.querySelector(".tel_container p");
-        telField.innerHTML = userData.phone;
+    var ageField = document.querySelector(".person_data p:nth-child(2)");
+    ageField.innerHTML = userData.dob.age + " years";
 
-        var celField = document.querySelector(".wpp_container p");
-        celField.innerHTML = userData.cell;
+    var celField = document.querySelector(".wpp_container p");
+    celField.innerHTML = userData.cell;
 
-        var emailField = document.querySelector(".mail_container p");
-        emailField.innerHTML = userData.email;
+    var telField = document.querySelector(".tel_container p");
+    telField.innerHTML = userData.phone;
 
-        var localField = document.querySelector(".local_container p");
-        localField.innerHTML = userData.location.street.number + " " + userData.location.street.name;
 
-        var postField = document.querySelector(".post_container p");
-        postField.innerHTML = userData.location.postcode;
+    var emailField = document.querySelector(".mail_container p");
+    emailField.innerHTML = userData.email;
 
-        var profileField = document.querySelector(".person_photo");
-        profileField.src = userData.picture.large;
-        
+    var localField = document.querySelector(".local_container p");
+    localField.innerHTML = userData.location.street.number + " " + userData.location.street.name;
+
+    var postField = document.querySelector(".post_container p");
+    postField.innerHTML = userData.location.postcode;
+
+    var profileField = document.querySelector(".person_photo");
+    profileField.src = userData.picture.large;
+
+    phoneMask(userData.phone, document.querySelector(".tel_container p"))
+    phoneMask(userData.cell, document.querySelector(".wpp_container p"))
+
 }
 
 var requestJSON = function(url, callback) { //Criando request do banco de dados//
@@ -181,24 +297,24 @@ var requestJSON = function(url, callback) { //Criando request do banco de dados/
         if (xhr.readyState === 4) {
             var obj = JSON.parse(xhr.responseText);
             callback(obj);
-            }
         }
+    }
     xhr.open('GET', url, true);
     xhr.send('');
 }
 
-var initMap=function(obj){
-    var place = {lat: Number(obj.location.coordinates.latitude), lng: Number(obj.location.coordinates.longitude)};
-   var map = new google.maps.Map(
-       document.getElementById('map'), {zoom: 1, center: place});
-   var marker = new google.maps.Marker({position: place, map: map});
+var initMap = function(obj) {
+    var place = { lat: Number(obj.location.coordinates.latitude), lng: Number(obj.location.coordinates.longitude) };
+    var map = new google.maps.Map(
+        document.getElementById('map'), { zoom: 4, center: place });
+    var marker = new google.maps.Marker({ position: place, map: map });
 }
 
-var initializeAPI= function(){  
+var initializeAPI = function() {
 
-    var body= document.querySelector("body");
-    var scriptContainer= document.createElement("script");
-    body.appendChild(scriptContainer);  
-    var url="https://maps.googleapis.com/maps/api/js?key=AIzaSyAl8YlkoUka-_WqecEFpCUuatP5Ta7p29E&callback=initializeMap";  
-    scriptContainer.setAttribute("src", url); 
+    var body = document.querySelector("body");
+    var scriptContainer = document.createElement("script");
+    body.appendChild(scriptContainer);
+    var url = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAl8YlkoUka-_WqecEFpCUuatP5Ta7p29E&callback=initializeMap";
+    scriptContainer.setAttribute("src", url);
 }
