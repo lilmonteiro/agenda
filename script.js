@@ -1,7 +1,6 @@
 var userData;
 var map;
 
-
 var inicia = function() {
     var searchButton = document.querySelector(".search_button");
     searchButton.addEventListener("click", swipeScreen.bind(window, true)); //Mobile - ao clicar na lupa swipa a tela//
@@ -20,31 +19,19 @@ var inicia = function() {
     resetBtn.addEventListener("click", resetEventHandler);
 
     requestJSON('https://randomuser.me/api/?results=100', function(obj) { // Chamando request do banco de dados//
-        userData = obj.results;
+        userData = obj.results;        
         fillUser(userData[0]); // Puxa o primeiro usuário //
         fillContactList(userData); // Na primeira vez, puxa a lista com TODOS os contatos
+        initializeAPI();       
     });
+}    
 
-    initializeAPI();
-}
-
-var initMap=function(){
-   var uluru = {lat: -25.344, lng: 131.036};
-   var map = new google.maps.Map(
-       document.getElementById('map'), {zoom: 8, center: uluru});
-   var marker = new google.maps.Marker({position: uluru, map: map});
-}
-
-var initializeAPI= function(){    
-    var body= document.querySelector("body");
-    var scriptContainer= document.createElement("script");
-    body.appendChild(scriptContainer);  
-    var url="https://maps.googleapis.com/maps/api/js?key=AIzaSyAl8YlkoUka-_WqecEFpCUuatP5Ta7p29E&callback=initMap";  
-    scriptContainer.setAttribute("src", url);  
+var initializeMap=function(){
+    console.log(1);
+    initMap(userData[0]);
 }
 
 var blurEventHandler = function(event) {
-    // console.log(event);
     var field = document.querySelector(".search-field");
     var resetBtn = document.querySelector(".reset-btn");
 
@@ -77,6 +64,7 @@ var fillContactList = function(objs) {
 
 var itemClickHandler = function(itemObj, event) {      
     fillUser(itemObj)
+    initMap(itemObj);
     swipeScreen(false);
     
     var resetBtn = document.querySelector(".reset-btn");
@@ -147,7 +135,6 @@ var inputChangeHandler = function(event) { // funcao pra filtrar os contatos //
     if (event.srcElement.value == "") {
         resetBtn.classList.remove("active");
     }
-
 }
 
 var eraseContactList = function() { //funcao pra limpar os contatos pra filtrar//
@@ -184,8 +171,8 @@ var fillUser = function(userData) // funcao que puxa do JSON e preenche no HTML 
 
         var profileField = document.querySelector(".person_photo");
         profileField.src = userData.picture.large;
-       
-    }
+        
+}
 
 var requestJSON = function(url, callback) { //Criando request do banco de dados//
     var xhr = new XMLHttpRequest();
@@ -194,8 +181,24 @@ var requestJSON = function(url, callback) { //Criando request do banco de dados/
         if (xhr.readyState === 4) {
             var obj = JSON.parse(xhr.responseText);
             callback(obj);
+            }
         }
-    }
     xhr.open('GET', url, true);
     xhr.send('');
+}
+
+var initMap=function(obj){
+    var place = {lat: Number(obj.location.coordinates.latitude), lng: Number(obj.location.coordinates.longitude)};
+   var map = new google.maps.Map(
+       document.getElementById('map'), {zoom: 1, center: place});
+   var marker = new google.maps.Marker({position: place, map: map});
+}
+
+var initializeAPI= function(){  
+
+    var body= document.querySelector("body");
+    var scriptContainer= document.createElement("script");
+    body.appendChild(scriptContainer);  
+    var url="https://maps.googleapis.com/maps/api/js?key=AIzaSyAl8YlkoUka-_WqecEFpCUuatP5Ta7p29E&callback=initializeMap";  
+    scriptContainer.setAttribute("src", url); 
 }
