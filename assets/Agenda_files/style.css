@@ -1,0 +1,93 @@
+body {
+    background-color: lightgray;
+    width: 100%;
+    font-family: sans-serif;
+
+}
+
+div {
+    display: block;
+}
+
+.window_container {
+    position: absolute;
+    margin: 10% auto auto auto;
+    left: 5%;
+    right: 5%;
+    border-radius: 20px;
+    background-color: white;
+    height: 700px;
+    width: 90%;
+}
+
+.contacts_bar {
+    background-color: #686868;
+    margin: 0px;
+    position: relative;
+    width: 30%;
+    height: 40px;
+    top: 10%;
+    left: 5%;
+    border-radius: 10px 10px 0 0;
+}
+
+.contacts_bar p {
+    margin: 0px;
+    text-align: center;
+    padding: 10px;
+    font-family: sans-serif;
+    font-weight: 800;
+    color: white;
+}
+
+.contacts_container {
+    position: relative;
+    background-color: #F2F2F2;
+    width: 30%;
+    height: 75%;
+    top: 10%;
+    left: 5%;
+    border-radius: 0 0 10px 10px;
+    padding-top: 5px;
+}
+
+.contacts_container p {
+    margin: 0;
+    padding: 15px;
+}
+
+.contacts_container hr{
+    border-top: 1px solid #888888;
+    width: 90%;
+}
+
+.contact_initial {
+    position: absolute;
+    background-image: url(assets/initial_bg.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 30px;
+
+    left: 10px;
+    color: white;
+    font-family: sans-serif;
+}
+
+.contact_name {
+    position: relative;
+    left: 50px;
+}
+
+.person_container {
+    position: absolute;
+    background-color: #F2F2F2;
+    width: 55%;
+    height: 80%;
+    left: 40%;
+    top: 10%;
+    border-radius: 10px;
+}
+
+.person_img{
+    border-radius: 100px;
+}
