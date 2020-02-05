@@ -295,11 +295,23 @@ a:active {
     word-wrap: break-word;
 }
 
+.edit-icon{
+    display: grid;
+    justify-self: end;
+    grid-column: 1;
+    width: 1.5em;
+    height: auto;
+    margin: 2em;
+    position: absolute;
+}
+
+
 #person_name {
     font-size: 1.5em;
     font-weight: 800;
     word-wrap: break-word;
 }
+
 
 .tel_container,
 .wpp_container,
