@@ -1,5 +1,6 @@
 var userData;
 var map;
+var contatoAtual;
 
 var inicia = function() {
     var searchButton = document.querySelector(".search_button");
@@ -19,29 +20,116 @@ var inicia = function() {
     resetBtn.addEventListener("click", resetEventHandler);
 
     var editBtn = document.querySelector(".edit-icon");
-    // editableField.addEventListener("click", editEventHandler);
     editBtn.addEventListener("click", editClickEventHandler);
-
-    var nameField = document.querySelector(".person_data p:nth-child(1)");
-    nameField.addEventListener("keydown", keydownEventHandler);
-    var ageField = document.querySelector(".person_data p:nth-child(2)");
-    ageField.addEventListener("keydown", keydownEventHandler);
-    var telField = document.querySelector(".tel_container p");
-    telField.addEventListener("keydown", keydownEventHandler);
-    var celField = document.querySelector(".wpp_container p");
-    celField.addEventListener("keydown", keydownEventHandler);
-    var emailField = document.querySelector(".mail_container p");
-    emailField.addEventListener("keydown", keydownEventHandler);
 
     requestJSON('https://randomuser.me/api/?results=100', function(obj) { // Chamando request do banco de dados//
         userData = obj.results;
-        regExNumbers(userData); // tira a formatacao estranha nativa pra uma string só de numberos
-        fillUser(userData[0]); // Puxa o primeiro usuário //
+        regExNumbers(userData); // tira a formatacao nativa pra uma string só de numberos
+        fillUser(userData[0]); // Puxa o primeiro usuário // 
         fillContactList(userData); // Na primeira vez, puxa a lista com TODOS os contatos
         phoneMask(userData[0].phone, document.querySelector(".tel_container p")); // formata do jeito que eu quero agora
         phoneMask(userData[0].cell, document.querySelector(".wpp_container p")); // formata do jeito que eu quero agora
         initializeAPI();
+
+        contatoAtual = userData[0];
+
+        var nameField = document.querySelector(".person_data p:nth-child(1)");
+        nameField.addEventListener("keydown", keydownEventHandler.bind(window, nameField, "name", contatoAtual));
+
+        // var ageField = document.querySelector(".person_data p:nth-child(2)");
+        // ageField.addEventListener("keydown", keydownEventHandler.bind(window, ageField, "dob.age", userData[0]));
+
+        // var ageField = document.querySelector(".person_data p:nth-child(2)");
+        // ageField.addEventListener("keydown", keydownEventHandler.bind(window, ageField, "phone", userData[0]));
+
+        // var celField = document.querySelector(".wpp_container p");
+        // celField.addEventListener("keydown", keydownEventHandler.bind(window, celField, "cell", userData[0]));
+
+        // var emailField = document.querySelector(".mail_container p");
+        // emailField.addEventListener("keydown", keydownEventHandler.bind(window, emailField, "email", userData[0]));
     });
+}
+
+
+var fillUser = function(userData) { // funcao que puxa do JSON e preenche no HTML (parametro - base de dados)// 
+
+    var nameField = document.querySelector(".person_data p:nth-child(1)");
+    nameField.innerHTML = userData.name.first + " " + userData.name.last;
+
+    var ageField = document.querySelector(".person_data p:nth-child(2)");
+    ageField.innerHTML = userData.dob.age + " years";
+
+    var celField = document.querySelector(".wpp_container p");
+    celField.innerHTML = userData.cell;
+
+    var telField = document.querySelector(".tel_container p");
+    telField.innerHTML = userData.phone;
+
+
+    var emailField = document.querySelector(".mail_container p");
+    emailField.innerHTML = userData.email;
+
+    var localField = document.querySelector(".local_container p");
+    localField.innerHTML = userData.location.street.number + " " + userData.location.street.name;
+
+    var postField = document.querySelector(".post_container p");
+    postField.innerHTML = userData.location.postcode;
+
+    var profileField = document.querySelector(".person_photo");
+    profileField.src = userData.picture.large;
+
+    phoneMask(userData.phone, document.querySelector(".tel_container p"))
+    phoneMask(userData.cell, document.querySelector(".wpp_container p"))
+
+}
+
+var editClickEventHandler = function(event) {
+    var nameField = document.querySelector(".person_data p:nth-child(1)");
+    var ageField = document.querySelector(".person_data p:nth-child(2)");
+    var telField = document.querySelector(".tel_container p");
+    var celField = document.querySelector(".wpp_container p");
+    var emailField = document.querySelector(".mail_container p");
+
+    nameField.contentEditable = "true";
+    ageField.contentEditable = "true";
+    telField.contentEditable = "true";
+    celField.contentEditable = "true";
+    emailField.contentEditable = "true";
+
+    nameField.focus();
+}
+
+var keydownEventHandler = function(field, property, obj, event) {
+    var enter = event.which == 13;
+    var esc = event.which == 27;
+
+    if (enter == true) {
+        editContent(property, obj, event);
+        field.blur();
+        eraseContactList();
+        fillContactList(userData);
+    } else if (esc) {
+        document.execCommand('undo');
+        field.blur();
+    }
+}
+
+var editContent = function(property, obj, event) {
+    if (property == "name") {
+        var newName = event.target.innerHTML;
+        var newNameArray = newName.split(" ");
+        obj.name.first = newNameArray[0];
+        obj.name.last = newNameArray[newNameArray.length - 1];
+
+    } else if (property == "dob.age") {
+        obj.dob.age = event.target.innerHTML;
+    } else if (property == "phone") {
+        obj.phone = event.target.innerHTML;
+    } else if (property == "cell") {
+        obj.cell = event.target.innerHTML;
+    } else if (property == "email") {
+        obj.email = event.target.innerHTML;
+    }
 }
 
 var phoneMask = function(number, field) {
@@ -72,68 +160,19 @@ var phoneMask = function(number, field) {
     } else if (oitoNum) {
         const parte1 = numeroAtual.slice(0, 4);
         const parte2 = numeroAtual.slice(4);
-        numeroFormatado = "(XX)"+" "+parte1 + "-" + parte2;
+        numeroFormatado = "(XX)" + " " + parte1 + "-" + parte2;
     } else if (seteNum) {
         const parte1 = numeroAtual.slice(0, 3);
         const parte2 = numeroAtual.slice(3);
-        numeroFormatado = "(XX)"+" "+parte1 + "-" + parte2;
-    } else {
-        console.log("nao tem format")
+        numeroFormatado = "(XX)" + " " + parte1 + "-" + parte2;
     }
 
     field.innerHTML = numeroFormatado;
 }
 
-var editClickEventHandler = function(event) {
-    var nameField = document.querySelector(".person_data p:nth-child(1)");
-    var ageField = document.querySelector(".person_data p:nth-child(2)");
-    var telField = document.querySelector(".tel_container p");
-    var celField = document.querySelector(".wpp_container p");
-    var emailField = document.querySelector(".mail_container p");
-
-    nameField.contentEditable = "true";
-    ageField.contentEditable = "true";
-    telField.contentEditable = "true";
-    celField.contentEditable = "true";
-    emailField.contentEditable = "true";
-
-    nameField.focus();
-}
-
-var keydownEventHandler = function(event) {
-    var nameField = document.querySelector(".person_data p:nth-child(1)");
-    var ageField = document.querySelector(".person_data p:nth-child(2)");
-    var telField = document.querySelector(".tel_container p");
-    var celField = document.querySelector(".wpp_container p");
-    var emailField = document.querySelector(".mail_container p");
-
-    var enter = event.which == 13;
-    var esc = event.which == 27;
-
-    if (enter == true) {
-        userData[0].name = event.target.innerHTML;
-        userData[0].age = event.target.innerHTML;
-        userData[0].tell = event.target.innerHTML;
-        userData[0].cell = event.target.innerHTML;
-        userData[0].email = event.target.innerHTML;
-
-        nameField.blur();
-        ageField.blur();
-        telField.blur();
-        celField.blur();
-        emailField.blur();
-    } else if (esc) {
-        document.execCommand('undo');
-        nameField.blur();
-        ageField.blur();
-        telField.blur();
-        celField.blur();
-        emailField.blur();
-    }
-}
-
 var initializeMap = function() {
     initMap(userData[0]);
+
 }
 
 var blurEventHandler = function(event) {
@@ -160,7 +199,8 @@ var searchEventHandler = function(event) {
     searchField.focus();
 }
 var fillContactList = function(objs) {
-    for (var i = 0; i < objs.length; i++) { // for que preenche cada um da lista//
+    var i;
+    for (i = 0; i < objs.length; i++) { // for que preenche cada um da lista//
         let newItem = createNewContact(objs[i].name.first + " " + objs[i].name.last);
         newItem.setAttribute("index", i);
         newItem.addEventListener("click", itemClickHandler.bind(window, objs[i]));
@@ -187,6 +227,8 @@ var itemClickHandler = function(itemObj, event) {
         resetBtn.classList.remove("active");
         field.classList.remove("active");
     }
+
+    contatoAtual = itemObj;  
 }
 
 var createNewContact = function(name) { // cria containers pro contato na lista//
@@ -256,37 +298,6 @@ var eraseContactList = function() { //funcao pra limpar os contatos pra filtrar/
     for (var j = 0; j < toRemove.length; j++) {
         removeContactContainer.removeChild(toRemove[j]);
     }
-}
-
-var fillUser = function(userData) { // funcao que puxa do JSON e preenche no HTML (parametro - base de dados)// 
-
-    var nameField = document.querySelector(".person_data p:nth-child(1)");
-    nameField.innerHTML = userData.name.first + " " + userData.name.last;
-
-    var ageField = document.querySelector(".person_data p:nth-child(2)");
-    ageField.innerHTML = userData.dob.age + " years";
-
-    var celField = document.querySelector(".wpp_container p");
-    celField.innerHTML = userData.cell;
-
-    var telField = document.querySelector(".tel_container p");
-    telField.innerHTML = userData.phone;
-
-
-    var emailField = document.querySelector(".mail_container p");
-    emailField.innerHTML = userData.email;
-
-    var localField = document.querySelector(".local_container p");
-    localField.innerHTML = userData.location.street.number + " " + userData.location.street.name;
-
-    var postField = document.querySelector(".post_container p");
-    postField.innerHTML = userData.location.postcode;
-
-    var profileField = document.querySelector(".person_photo");
-    profileField.src = userData.picture.large;
-
-    phoneMask(userData.phone, document.querySelector(".tel_container p"))
-    phoneMask(userData.cell, document.querySelector(".wpp_container p"))
 
 }
 
