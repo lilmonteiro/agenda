@@ -31,8 +31,6 @@ var inicia = function() {
         phoneMask(userData[0].cell, document.querySelector(".wpp_container p")); // formata do jeito que eu quero agora
         initializeAPI();
 
-        contatoAtual = userData[0];
-
         var nameField = document.querySelector(".person_data p:nth-child(1)");
         nameField.addEventListener("keydown", keydownEventHandler.bind(window, nameField, "name", contatoAtual));
 
@@ -51,35 +49,35 @@ var inicia = function() {
 }
 
 
-var fillUser = function(userData) { // funcao que puxa do JSON e preenche no HTML (parametro - base de dados)// 
-
+var fillUser = function(data) { // funcao que puxa do JSON e preenche no HTML (parametro - base de dados)// 
+    contatoAtual=data;
     var nameField = document.querySelector(".person_data p:nth-child(1)");
-    nameField.innerHTML = userData.name.first + " " + userData.name.last;
+    nameField.innerHTML = data.name.first + " " + data.name.last;
 
     var ageField = document.querySelector(".person_data p:nth-child(2)");
-    ageField.innerHTML = userData.dob.age + " years";
+    ageField.innerHTML = data.dob.age + " years";
 
     var celField = document.querySelector(".wpp_container p");
-    celField.innerHTML = userData.cell;
+    celField.innerHTML = data.cell;
 
     var telField = document.querySelector(".tel_container p");
-    telField.innerHTML = userData.phone;
+    telField.innerHTML = data.phone;
 
 
     var emailField = document.querySelector(".mail_container p");
-    emailField.innerHTML = userData.email;
+    emailField.innerHTML = data.email;
 
     var localField = document.querySelector(".local_container p");
-    localField.innerHTML = userData.location.street.number + " " + userData.location.street.name;
+    localField.innerHTML = data.location.street.number + " " + data.location.street.name;
 
     var postField = document.querySelector(".post_container p");
-    postField.innerHTML = userData.location.postcode;
+    postField.innerHTML = data.location.postcode;
 
     var profileField = document.querySelector(".person_photo");
-    profileField.src = userData.picture.large;
+    profileField.src = data.picture.large;
 
-    phoneMask(userData.phone, document.querySelector(".tel_container p"))
-    phoneMask(userData.cell, document.querySelector(".wpp_container p"))
+    phoneMask(data.phone, document.querySelector(".tel_container p"))
+    phoneMask(data.cell, document.querySelector(".wpp_container p"))
 
 }
 
@@ -219,16 +217,12 @@ var itemClickHandler = function(itemObj, event) {
     initMap(itemObj);
     swipeScreen(false);
 
-    var resetBtn = document.querySelector(".reset-btn");
-    var field = document.querySelector(".search-field");
-
     if (event) {
         resetEventHandler();
         resetBtn.classList.remove("active");
         field.classList.remove("active");
     }
 
-    contatoAtual = itemObj;  
 }
 
 var createNewContact = function(name) { // cria containers pro contato na lista//
