@@ -32,37 +32,41 @@ var inicia = function() {
         initializeAPI();
 
         var nameField = document.querySelector(".person_data p:nth-child(1)");
-        nameField.addEventListener("keydown", keydownEventHandler.bind(window, nameField, "name", contatoAtual));
+        nameField.addEventListener("keydown", keydownEventHandler.bind(window, nameField, "name"));
 
-        // var ageField = document.querySelector(".person_data p:nth-child(2)");
-        // ageField.addEventListener("keydown", keydownEventHandler.bind(window, ageField, "dob.age", userData[0]));
+        var ageField = document.querySelector(".person_data p:nth-child(2)");
+        ageField.addEventListener("keydown", keydownEventHandler.bind(window, ageField, "dob.age"));
 
-        // var ageField = document.querySelector(".person_data p:nth-child(2)");
-        // ageField.addEventListener("keydown", keydownEventHandler.bind(window, ageField, "phone", userData[0]));
+        var telField = document.querySelector(".tel_container p");
+        telField.addEventListener("keydown", keydownEventHandler.bind(window, telField, "phone"));
 
-        // var celField = document.querySelector(".wpp_container p");
-        // celField.addEventListener("keydown", keydownEventHandler.bind(window, celField, "cell", userData[0]));
+        var celField = document.querySelector(".wpp_container p");
+        celField.addEventListener("keydown", keydownEventHandler.bind(window, celField, "cell"));
 
-        // var emailField = document.querySelector(".mail_container p");
-        // emailField.addEventListener("keydown", keydownEventHandler.bind(window, emailField, "email", userData[0]));
+        var emailField = document.querySelector(".mail_container p");
+        emailField.addEventListener("keydown", keydownEventHandler.bind(window, emailField, "email"));
     });
 }
 
 
 var fillUser = function(data) { // funcao que puxa do JSON e preenche no HTML (parametro - base de dados)// 
-    contatoAtual=data;
+    contatoAtual = data;
+
     var nameField = document.querySelector(".person_data p:nth-child(1)");
     nameField.innerHTML = data.name.first + " " + data.name.last;
 
+    var birthDay= data.dob.date;
+    var birthYear= new Date(birthDay).getFullYear();
+    var currentYear= new Date().getFullYear();
+    
     var ageField = document.querySelector(".person_data p:nth-child(2)");
-    ageField.innerHTML = data.dob.age + " years";
+    ageField.innerHTML = (currentYear-birthYear) + " years";
 
     var celField = document.querySelector(".wpp_container p");
     celField.innerHTML = data.cell;
 
     var telField = document.querySelector(".tel_container p");
     telField.innerHTML = data.phone;
-
 
     var emailField = document.querySelector(".mail_container p");
     emailField.innerHTML = data.email;
@@ -78,7 +82,6 @@ var fillUser = function(data) { // funcao que puxa do JSON e preenche no HTML (p
 
     phoneMask(data.phone, document.querySelector(".tel_container p"))
     phoneMask(data.cell, document.querySelector(".wpp_container p"))
-
 }
 
 var editClickEventHandler = function(event) {
@@ -97,12 +100,12 @@ var editClickEventHandler = function(event) {
     nameField.focus();
 }
 
-var keydownEventHandler = function(field, property, obj, event) {
+var keydownEventHandler = function(field, property, event) {
     var enter = event.which == 13;
     var esc = event.which == 27;
 
     if (enter == true) {
-        editContent(property, obj, event);
+        editContent(property, contatoAtual, event);
         field.blur();
         eraseContactList();
         fillContactList(userData);
@@ -112,7 +115,7 @@ var keydownEventHandler = function(field, property, obj, event) {
     }
 }
 
-var editContent = function(property, obj, event) {
+var editContent = function(property, obj,  event) {
     if (property == "name") {
         var newName = event.target.innerHTML;
         var newNameArray = newName.split(" ");
@@ -120,7 +123,8 @@ var editContent = function(property, obj, event) {
         obj.name.last = newNameArray[newNameArray.length - 1];
 
     } else if (property == "dob.age") {
-        obj.dob.age = event.target.innerHTML;
+        obj.dob.age = 20;
+        // obj.dob.age = event.target.innerHTML;
     } else if (property == "phone") {
         obj.phone = event.target.innerHTML;
     } else if (property == "cell") {
@@ -216,13 +220,13 @@ var itemClickHandler = function(itemObj, event) {
     fillUser(itemObj)
     initMap(itemObj);
     swipeScreen(false);
+    var resetBtn = document.querySelector(".reset-btn");
 
     if (event) {
         resetEventHandler();
         resetBtn.classList.remove("active");
-        field.classList.remove("active");
+        // field.classList.remove("active");
     }
-
 }
 
 var createNewContact = function(name) { // cria containers pro contato na lista//
@@ -250,7 +254,6 @@ var createNewContact = function(name) { // cria containers pro contato na lista/
 
 var swipeScreen = function(listScreen, event) { //Mobile - funcao pra mudar de uma tela pra outra//
     var contactScreen = document.querySelector(".window_container");
-
     if (!listScreen) {
         contactScreen.classList.remove("transition-mobile");
     } else {
