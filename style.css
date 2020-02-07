@@ -137,7 +137,8 @@ a {
     opacity: 1;
 }
 
-.reset-btn {
+
+.reset-btn, .add-btn {
     position: relative;
     display: flex;
     height: 2em;
@@ -145,7 +146,8 @@ a {
     z-index: 1;
     box-sizing: border-box;
     justify-content: center;
-    padding: 0.5em;
+    padding: 0.3em;
+    margin: 0.2em;
     cursor: pointer;
     grid-column: 2;
     grid-row: 1;
@@ -155,8 +157,13 @@ a {
     visibility: visible;
 }
 
+.add-btn{
+    visibility: visible;
+}
+
 .reset-bar1,
-.reset-bar2 {
+.reset-bar2, .add-bar1,
+.add-bar2 {
     display: flex;
     background-color: rgb(80, 80, 80);
     height: 100%;
@@ -169,6 +176,16 @@ a {
 
 .reset-bar2 {
     transform: rotate(-45deg) translate(-0.1em, 0.05em);
+}
+
+.add-bar1 {
+    transform: rotate(90deg) translate(0.0em, -0.1em);
+    background-color: rgb(255, 255, 255);
+}
+
+.add-bar2 {
+    transform: rotate(-180deg) translate(0.1em, 0.0em);
+    background-color: rgb(255, 255, 255);
 }
 
 .contact_icon {
