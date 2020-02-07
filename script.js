@@ -50,17 +50,16 @@ var inicia = function() {
 
 
 var fillUser = function(data) { // funcao que puxa do JSON e preenche no HTML (parametro - base de dados)// 
-    contatoAtual = data;
 
     var nameField = document.querySelector(".person_data p:nth-child(1)");
     nameField.innerHTML = data.name.first + " " + data.name.last;
 
-    var birthDay= data.dob.date;
-    var birthYear= new Date(birthDay).getFullYear();
-    var currentYear= new Date().getFullYear();
-    
+    var birthDay = data.dob.date;
+    var birthYear = new Date(birthDay).getFullYear();
+    var currentYear = new Date().getFullYear();
+
     var ageField = document.querySelector(".person_data p:nth-child(2)");
-    ageField.innerHTML = (currentYear-birthYear) + " years";
+    ageField.innerHTML = (currentYear - birthYear) + " years";
 
     var celField = document.querySelector(".wpp_container p");
     celField.innerHTML = data.cell;
@@ -82,6 +81,8 @@ var fillUser = function(data) { // funcao que puxa do JSON e preenche no HTML (p
 
     phoneMask(data.phone, document.querySelector(".tel_container p"))
     phoneMask(data.cell, document.querySelector(".wpp_container p"))
+
+    contatoAtual = data;
 }
 
 var editClickEventHandler = function(event) {
@@ -115,7 +116,7 @@ var keydownEventHandler = function(field, property, event) {
     }
 }
 
-var editContent = function(property, obj,  event) {
+var editContent = function(property, obj, event) {
     if (property == "name") {
         var newName = event.target.innerHTML;
         var newNameArray = newName.split(" ");
@@ -123,8 +124,7 @@ var editContent = function(property, obj,  event) {
         obj.name.last = newNameArray[newNameArray.length - 1];
 
     } else if (property == "dob.age") {
-        obj.dob.age = 20;
-        // obj.dob.age = event.target.innerHTML;
+        obj.dob.age = event.target.innerHTML;;
     } else if (property == "phone") {
         obj.phone = event.target.innerHTML;
     } else if (property == "cell") {
@@ -179,20 +179,19 @@ var initializeMap = function() {
 
 var blurEventHandler = function(event) {
     var field = document.querySelector(".search-field");
-    var resetBtn = document.querySelector(".reset-btn");
-
     if (event.srcElement.value == "") {
         field.classList.remove("active");
-    }
-    if (event == true) {
-        resetBtn.remove("active");
     }
 }
 
 var resetEventHandler = function(event) {
     document.querySelector(".search-field").value = "";
-    fillContactList(userData);
+
+    var resetBtn = document.querySelector(".reset-btn");
+    resetBtn.classList.remove("active");
+
     document.querySelector(".search-field").focus();
+    fillContactList(userData);
 }
 
 var searchEventHandler = function(event) {
@@ -200,6 +199,7 @@ var searchEventHandler = function(event) {
     searchField.classList.add("active");
     searchField.focus();
 }
+
 var fillContactList = function(objs) {
     var i;
     for (i = 0; i < objs.length; i++) { // for que preenche cada um da lista//
@@ -220,13 +220,11 @@ var itemClickHandler = function(itemObj, event) {
     fillUser(itemObj)
     initMap(itemObj);
     swipeScreen(false);
+    
     var resetBtn = document.querySelector(".reset-btn");
 
-    if (event) {
-        resetEventHandler();
-        resetBtn.classList.remove("active");
-        // field.classList.remove("active");
-    }
+    resetEventHandler();
+    resetBtn.classList.remove("active");
 }
 
 var createNewContact = function(name) { // cria containers pro contato na lista//
@@ -279,12 +277,12 @@ var inputChangeHandler = function(event) { // funcao pra filtrar os contatos //
     fillContactList(filtered);
 
     var resetBtn = document.querySelector(".reset-btn");
-    resetBtn.classList.add("active");
-
     var field = document.querySelector(".search-field");
 
     if (event.srcElement.value == "") {
         resetBtn.classList.remove("active");
+    } else {
+        resetBtn.classList.add("active");
     }
 }
 
