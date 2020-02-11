@@ -1,6 +1,8 @@
 var userData;
 var map;
 var contatoAtual;
+var newName, newBirthday, newPhone, newCell, newEmail;
+var novoContato;
 
 var inicia = function() {
     var searchButton = document.querySelector(".search_button");
@@ -11,6 +13,14 @@ var inicia = function() {
 
     var contactButton = document.querySelector(".contact_icon");
     contactButton.addEventListener("click", swipeScreen.bind(window, false)); //Mobile - ao clicar no contact swipa a tela//
+
+    var addNewContact = document.querySelector(".add-btn");
+    addNewContact.addEventListener("click", addNewContactHandler);
+
+    var cancelBtn = document.querySelector("#cancel-btn");
+    var saveBtn = document.querySelector("#save-btn");
+    cancelBtn.addEventListener("click", cancelEventHandler);
+    saveBtn.addEventListener("click", saveEventHandler);
 
     var inputCheck = document.querySelector(".search-field ");
     inputCheck.addEventListener("input", inputChangeHandler); // Filtro de contatos por input //
@@ -31,23 +41,165 @@ var inicia = function() {
         phoneMask(userData[0].cell, document.querySelector(".wpp_container p")); // formata do jeito que eu quero agora
         initializeAPI();
 
-        var nameField = document.querySelector(".person_data p:nth-child(1)");
-        nameField.addEventListener("keydown", keydownEventHandler.bind(window, nameField, "name"));
-
-        var ageField = document.querySelector(".person_data p:nth-child(2)");
-        ageField.addEventListener("keydown", keydownEventHandler.bind(window, ageField, "dob.age"));
-
-        var telField = document.querySelector(".tel_container p");
-        telField.addEventListener("keydown", keydownEventHandler.bind(window, telField, "phone"));
-
-        var celField = document.querySelector(".wpp_container p");
-        celField.addEventListener("keydown", keydownEventHandler.bind(window, celField, "cell"));
-
-        var emailField = document.querySelector(".mail_container p");
-        emailField.addEventListener("keydown", keydownEventHandler.bind(window, emailField, "email"));
     });
 }
 
+var addNewContactHandler = function(event) {
+    var personContainer = document.querySelector(".person_container");
+    var personPhoto = document.querySelector(".person_photo");
+    var newContactBtn = document.querySelector(".newcontact-btn");
+    var editBtn = document.querySelector(".edit-icon");
+
+    var nameField = document.querySelector(".person_data p:nth-child(1)");
+    var ageField = document.querySelector(".person_data p:nth-child(2)");
+    var telField = document.querySelector(".tel_container p");
+    var telContainer = document.querySelector(".tel_container");
+    var celField = document.querySelector(".wpp_container p");
+    var celContainer = document.querySelector(".wpp_container");
+    var emailField = document.querySelector(".mail_container p");
+    var emailContainer = document.querySelector(".mail_container");
+
+    personPhoto.src = "assets/default-profile.svg";
+
+    personContainer.classList.add("new-contact");
+    newContactBtn.classList.add("active");
+    editBtn.classList.remove("active");
+
+    nameField.classList.add("newcontact");
+    ageField.classList.add("newcontact");
+    telContainer.classList.add("newcontact");
+    celContainer.classList.add("newcontact");
+    emailContainer.classList.add("newcontact");
+
+    turnEditableContent(true);
+
+    nameField.innerHTML = " ";
+    ageField.innerHTML = "";
+    telField.innerHTML = "";
+    celField.innerHTML = "";
+    emailField.innerHTML = "";
+
+    nameField.addEventListener("keydown", newContactKeyDownHandler.bind(window, nameField, "name"));
+    ageField.addEventListener("keydown", newContactKeyDownHandler.bind(window, ageField, "age"));
+    telField.addEventListener("keydown", newContactKeyDownHandler.bind(window, telField, "phone"));
+    celField.addEventListener("keydown", newContactKeyDownHandler.bind(window, celField, "cell"));
+    emailField.addEventListener("keydown", newContactKeyDownHandler.bind(window, emailField, "email"));
+}
+
+var newContactKeyDownHandler = function(field, property, event) {
+    var enter = event.which == 13;
+    var esc = event.which == 27;
+
+    if (enter == true) {
+        field.blur();
+    } else if (esc) {
+        document.execCommand('undo');
+        field.blur();
+    }
+
+    if (property == "name") {
+        newName = event.target.innerHTML;
+    } else if (property == "age") {
+        newBirthday = event.target.innerHTML;;
+    } else if (property == "phone") {
+        newPhone = event.target.innerHTML;
+    } else if (property == "cell") {
+        newCell = event.target.innerHTML;
+    } else if (property == "email") {
+        newEmail = event.target.innerHTML;
+    }
+}
+
+var cancelEventHandler = function(event) {
+    var nameField = document.querySelector(".person_data p:nth-child(1)");
+    var ageField = document.querySelector(".person_data p:nth-child(2)");
+    var telContainer = document.querySelector(".tel_container");
+    var celContainer = document.querySelector(".wpp_container");
+    var emailContainer = document.querySelector(".mail_container");
+    var editBtn = document.querySelector(".edit-icon");
+    var personContainer = document.querySelector(".person_container");
+    var newContactBtn = document.querySelector(".newcontact-btn");
+
+
+    nameField.classList.remove("newcontact");
+    ageField.classList.remove("newcontact");
+    telContainer.classList.remove("newcontact");
+    celContainer.classList.remove("newcontact");
+    emailContainer.classList.remove("newcontact");
+
+    personContainer.classList.remove("new-contact");
+    newContactBtn.classList.remove("active");
+    editBtn.classList.add("active");
+
+    fillUser(contatoAtual);
+};
+
+var saveEventHandler = function(event) {
+    var nameField = document.querySelector(".person_data p:nth-child(1)");
+    var ageField = document.querySelector(".person_data p:nth-child(2)");
+    var telContainer = document.querySelector(".tel_container");
+    var celContainer = document.querySelector(".wpp_container");
+    var emailContainer = document.querySelector(".mail_container");
+    var editBtn = document.querySelector(".edit-icon");
+    var personContainer = document.querySelector(".person_container");
+    var newContactBtn = document.querySelector(".newcontact-btn");
+    var currentYear = new Date().getFullYear();
+
+    novoContato = {
+        "name": {},
+        "dob": {
+            "date": new Date(newBirthday),
+            "age": currentYear - newBirthday,
+        },
+        "phone": newPhone,
+        "cell": newCell,
+        "email": newEmail,
+        "location": {
+            "street": {
+                "number": 7155,
+                "name": "Route de Genas"
+            },
+            "city": "Rennes",
+            "state": "Alpes-Maritimes",
+            "country": "France",
+            "postcode": 15159,
+            "coordinates": {
+                "latitude": "-4.9679",
+                "longitude": "-104.9438"
+            },
+        },
+        "picture": {
+            "large": "assets/default-profile.svg",
+        }
+    }
+    if (newName == undefined) {
+        alert("Você precisa inserir um nome para salvar!")
+    } else if (newPhone == undefined) {
+        alert("Você precisa inserir um número de telefone válido")
+    } else if (newCell == undefined) {
+        alert("Você precisa inserir um celular válido")
+    } else if (newEmail == undefined) {
+        alert("Você precisa inserir um email válido")
+    }
+
+    splitNamer(newName, novoContato);
+
+    userData.push(novoContato);
+    fillContactList(userData);
+    fillUser(novoContato);
+
+    personContainer.classList.remove("new-contact");
+    newContactBtn.classList.remove("active");
+    nameField.classList.remove("newcontact");
+    ageField.classList.remove("newcontact");
+    telContainer.classList.remove("newcontact");
+    celContainer.classList.remove("newcontact");
+    emailContainer.classList.remove("newcontact");
+
+    editBtn.classList.add("active");
+    contatoAtual = userData[userData.length - 1];
+    turnEditableContent(false);
+};
 
 var fillUser = function(data) { // funcao que puxa do JSON e preenche no HTML (parametro - base de dados)// 
 
@@ -86,17 +238,31 @@ var fillUser = function(data) { // funcao que puxa do JSON e preenche no HTML (p
 }
 
 var editClickEventHandler = function(event) {
+    turnEditableContent(true);
+    var nameField = document.querySelector(".person_data p:nth-child(1)");
+    var ageField = document.querySelector(".person_data p:nth-child(2)");
+    var telField = document.querySelector(".tel_container p");
+    var celField = document.querySelector(".wpp_container p");
+    var emailField = document.querySelector(".mail_container p");
+    nameField.addEventListener("keydown", keydownEventHandler.bind(window, nameField, "name"));
+    ageField.addEventListener("keydown", keydownEventHandler.bind(window, ageField, "age"));
+    telField.addEventListener("keydown", keydownEventHandler.bind(window, telField, "phone"));
+    celField.addEventListener("keydown", keydownEventHandler.bind(window, celField, "cell"));
+    emailField.addEventListener("keydown", keydownEventHandler.bind(window, emailField, "email"));
+}
+
+var turnEditableContent = function(boolean) {
     var nameField = document.querySelector(".person_data p:nth-child(1)");
     var ageField = document.querySelector(".person_data p:nth-child(2)");
     var telField = document.querySelector(".tel_container p");
     var celField = document.querySelector(".wpp_container p");
     var emailField = document.querySelector(".mail_container p");
 
-    nameField.contentEditable = "true";
-    ageField.contentEditable = "true";
-    telField.contentEditable = "true";
-    celField.contentEditable = "true";
-    emailField.contentEditable = "true";
+    nameField.contentEditable = boolean;
+    ageField.contentEditable = boolean;
+    telField.contentEditable = boolean;
+    celField.contentEditable = boolean;
+    emailField.contentEditable = boolean;
 
     nameField.focus();
 }
@@ -116,14 +282,20 @@ var keydownEventHandler = function(field, property, event) {
     }
 }
 
+var splitNamer = function(nameToSplit, obj) {
+    var newNameArray = nameToSplit.split(" ");
+    obj.name.first = newNameArray[0];
+    obj.name.last = newNameArray[newNameArray.length - 1];
+
+    if (newNameArray[0] == newNameArray[1]) {
+        obj.name.last = "";
+    }
+}
+
 var editContent = function(property, obj, event) {
     if (property == "name") {
-        var newName = event.target.innerHTML;
-        var newNameArray = newName.split(" ");
-        obj.name.first = newNameArray[0];
-        obj.name.last = newNameArray[newNameArray.length - 1];
-
-    } else if (property == "dob.age") {
+        splitNamer(event.target.innerHTML, obj);
+    } else if (property == "age") {
         obj.dob.age = event.target.innerHTML;;
     } else if (property == "phone") {
         obj.phone = event.target.innerHTML;
@@ -220,11 +392,12 @@ var itemClickHandler = function(itemObj, event) {
     fillUser(itemObj)
     initMap(itemObj);
     swipeScreen(false);
-    
+
     var resetBtn = document.querySelector(".reset-btn");
 
     resetEventHandler();
     resetBtn.classList.remove("active");
+    cancelEventHandler();
 }
 
 var createNewContact = function(name) { // cria containers pro contato na lista//
