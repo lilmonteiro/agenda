@@ -34,14 +34,27 @@ var inicia = function() {
 
     requestJSON('https://randomuser.me/api/?results=100', function(obj) { // Chamando request do banco de dados//
         userData = obj.results;
+        userData.sort(compare);
         regExNumbers(userData); // tira a formatacao nativa pra uma string só de numberos
         fillUser(userData[0]); // Puxa o primeiro usuário // 
         fillContactList(userData); // Na primeira vez, puxa a lista com TODOS os contatos
         phoneMask(userData[0].phone, document.querySelector(".tel_container p")); // formata do jeito que eu quero agora
         phoneMask(userData[0].cell, document.querySelector(".wpp_container p")); // formata do jeito que eu quero agora
         initializeAPI();
-
     });
+}
+
+var compare = function(a, b) {
+    var iA = a.name.first;
+    var iB = b.name.first;
+
+    let comparison = 0;
+    if (iA > iB) {
+        comparison = 1;
+    } else if (iA < iB) {
+        comparison = -1;
+    }
+    return comparison;
 }
 
 var addNewContactHandler = function(event) {
@@ -185,6 +198,8 @@ var saveEventHandler = function(event) {
     splitNamer(newName, novoContato);
 
     userData.push(novoContato);
+    userData.sort(compare);
+    eraseContactList();
     fillContactList(userData);
     fillUser(novoContato);
 
