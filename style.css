@@ -3,6 +3,10 @@ html {
     height: 100%;
 }
 
+*:focus {
+    outline: none;
+}
+
 body {
     margin: 0;
     background-color: lightgray;
@@ -82,6 +86,7 @@ a {
     grid-column: 1 / span 1;
     grid-row: 1;
 }
+
 .search_button,
 .search-button-widescreen {
     display: block;
@@ -104,7 +109,7 @@ a {
     background-color: #8c8b8b;
     width: 2em;
     right: 0;
-    padding:  0.5em;
+    padding: 0.5em;
     cursor: pointer;
     z-index: 2;
     border-radius: 0 0 0 1em;
@@ -137,8 +142,8 @@ a {
     opacity: 1;
 }
 
-
-.reset-btn, .add-btn {
+.reset-btn,
+.add-btn {
     position: relative;
     display: flex;
     height: 2em;
@@ -153,16 +158,18 @@ a {
     grid-row: 1;
     visibility: hidden;
 }
-.reset-btn.active{
+
+.reset-btn.active {
     visibility: visible;
 }
 
-.add-btn{
+.add-btn {
     visibility: visible;
 }
 
 .reset-bar1,
-.reset-bar2, .add-bar1,
+.reset-bar2,
+.add-bar1,
 .add-bar2 {
     display: flex;
     background-color: rgb(80, 80, 80);
@@ -192,15 +199,11 @@ a {
     position: relative;
     cursor: pointer;
     height: 2em;
-    visibility: hidden;   
+    visibility: hidden;
 }
 
 a:link {
     color: black;
-}
-
-a:visited {
-    color: rgb(33, 33, 33);
 }
 
 a:hover {
@@ -229,11 +232,12 @@ a:active {
 }
 
 .contact_list a:hover {
-    background-color: rgb(177, 177, 177);
+    background-color: rgb(220, 220, 220);
 }
 
 .contact_list a:active {
-    background-color: white;
+    background-color: rgb(114, 114, 114);
+    color: white;
 }
 
 .contact_list p,
@@ -261,8 +265,6 @@ a:active {
 }
 
 .ellipsis {
-    width: 85%;
-    overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
@@ -278,6 +280,52 @@ a:active {
     grid-template-rows: auto auto 1fr;
     padding: 1em;
     grid-gap: 2em;
+}
+
+.person_container.new-contact {
+    background-color: rgb(215, 215, 215);
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr auto;
+    grid-gap: 1em;
+}
+
+.newcontact-btn {
+    display: none;
+}
+
+.newcontact-btn.active {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+#cancel-btn,
+#save-btn {
+    width: 10em;
+    height: 2em;
+    margin: 1em;
+    border-radius: 0.5em;
+    font-size: 1em;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+}
+
+#cancel-btn {
+    background-color: rgb(126, 126, 126);
+    color: rgb(193, 193, 193);
+}
+
+#cancel-btn:active {
+    background-color: rgb(165, 165, 165);
+}
+
+#save-btn {
+    background-color: rgb(82, 154, 0);
+}
+
+#save-btn:active {
+    background-color: rgb(112, 210, 0);
 }
 
 .data_container {
@@ -296,7 +344,8 @@ a:active {
     border-width: 5px;
     border: 5px solid white;
     justify-self: end;
-    width: auto
+    width: auto;
+    max-width: 8em;
 }
 
 .person_data {
@@ -312,7 +361,11 @@ a:active {
     word-wrap: break-word;
 }
 
-.edit-icon{
+.edit-icon {
+    display: none;
+}
+
+.edit-icon.active {
     display: grid;
     justify-self: end;
     grid-column: 1;
@@ -322,13 +375,38 @@ a:active {
     position: absolute;
 }
 
-
-#person_name {
+.person_name {
     font-size: 1.5em;
     font-weight: 800;
     word-wrap: break-word;
 }
 
+.person_name.newcontact,
+.tel_container.newcontact,
+.wpp_container.newcontact,
+.mail_container.newcontact, .person_data p:nth-child(2).newcontact {
+    width: 10em;
+    border-style: solid;
+    border-width: 0.01em;
+    border-color: #888888;
+    border-radius: 0.25em;
+    padding: 0.2em;
+    padding-top: 0;
+    margin-bottom: 0.2em;
+    background-color: white;
+}
+
+.newContactField{
+    width: 10em;   
+}
+
+#person_name:focus,
+.person_data p:focus,
+.tel_container p:focus,
+.wpp_container p:focus,
+.mail_container p:focus {
+    background-color: rgb(255, 255, 255);
+}
 
 .tel_container,
 .wpp_container,
@@ -337,6 +415,7 @@ a:active {
     flex-direction: row;
     justify-self: start;
 }
+
 
 .icon-tel {
     --my-icon: url('assets/tell.svg');
@@ -414,9 +493,6 @@ a:active {
     width: auto;
 }
 
-
-
-
 @media (max-width: 600px) {
     html {
         overflow: hidden;
@@ -461,8 +537,8 @@ a:active {
         border-width: 0.1em;
         border-color: rgb(160, 160, 160);
         border-radius: 1em 1em 0 0;
-        opacity: 1; 
-        grid-column: 1/ span 2;      
+        opacity: 1;
+        grid-column: 1/ span 2;
     }
     .search-field::placeholder {
         color: #F2F2F2;
@@ -471,8 +547,11 @@ a:active {
     .search-button-widescreen {
         display: none;
     }
-    .reset-btn{
+    .reset-btn {
         grid-column: 1/ span 1;
         justify-self: end;
+    }
+    .ellipsis {
+        width: 85%;
     }
 }
