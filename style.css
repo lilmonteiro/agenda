@@ -55,7 +55,7 @@ a {
     grid-column-start: 1;
     grid-column-end: 2;
     grid-row-start: 1;
-    width: 100%;
+    width: auto;
     grid-template-columns: 1fr;
     grid-template-rows: auto 2fr;
     background-color: #F2F2F2;
@@ -163,8 +163,12 @@ a {
     visibility: visible;
 }
 
-.add-btn {
+.add-btn.active {
     visibility: visible;
+}
+
+.add-btn{
+    visibility: hidden;
 }
 
 .reset-bar1,
@@ -280,6 +284,7 @@ a:active {
     grid-template-rows: auto auto 1fr;
     padding: 1em;
     grid-gap: 2em;
+    width: auto;
 }
 
 .person_container.new-contact {
@@ -287,6 +292,7 @@ a:active {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto 1fr auto;
     grid-gap: 1em;
+    padding-top: 3em;
 }
 
 .newcontact-btn {
@@ -345,7 +351,6 @@ a:active {
     border: 5px solid white;
     justify-self: end;
     width: auto;
-    max-width: 8em;
 }
 
 .person_data {
@@ -394,6 +399,13 @@ a:active {
     padding-top: 0;
     margin-bottom: 0.2em;
     background-color: white;
+    color: rgb(126, 126, 126);
+}
+
+.person_name.newcontact::placeholder {
+    color: red;
+    font-size: 1.2em;
+    font-style: italic;
 }
 
 .newContactField{
@@ -531,6 +543,12 @@ a:active {
         grid-row: 1;
         z-index: 1;
     }
+
+    .person_photo {
+        width: 5em;
+        justify-self: center;
+    }
+
     .search-field {
         width: 100%;
         border-style: solid;
@@ -552,6 +570,7 @@ a:active {
         justify-self: end;
     }
     .ellipsis {
-        width: 85%;
+        width: 70%;
+        overflow: hidden;
     }
 }
