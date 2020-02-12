@@ -16,6 +16,7 @@ var inicia = function() {
 
     var addNewContact = document.querySelector(".add-btn");
     addNewContact.addEventListener("click", addNewContactHandler);
+    addNewContact.addEventListener("click", swipeScreen.bind(window, false));
 
     var cancelBtn = document.querySelector("#cancel-btn");
     var saveBtn = document.querySelector("#save-btn");
@@ -85,18 +86,34 @@ var addNewContactHandler = function(event) {
     emailContainer.classList.add("newcontact");
 
     turnEditableContent(true);
+    nameField.blur();
 
-    nameField.innerHTML = " ";
-    ageField.innerHTML = "";
-    telField.innerHTML = "";
-    celField.innerHTML = "";
-    emailField.innerHTML = "";
+   
+    nameField.innerHTML = "Nome";
+    ageField.innerHTML = "Data de Nascimento";
+    telField.innerHTML = "Telefone";
+    celField.innerHTML = "Celular";
+    emailField.innerHTML = "E-mail";
 
+    nameField.addEventListener("click", onClickErase.bind(window, nameField, "name"));
     nameField.addEventListener("keydown", newContactKeyDownHandler.bind(window, nameField, "name"));
+
+
+    ageField.addEventListener("click", onClickErase.bind(window, ageField));
     ageField.addEventListener("keydown", newContactKeyDownHandler.bind(window, ageField, "age"));
+
+    telField.addEventListener("click", onClickErase.bind(window, telField));
     telField.addEventListener("keydown", newContactKeyDownHandler.bind(window, telField, "phone"));
+    
+    celField.addEventListener("click", onClickErase.bind(window, celField));
     celField.addEventListener("keydown", newContactKeyDownHandler.bind(window, celField, "cell"));
+    
+    emailField.addEventListener("click", onClickErase.bind(window, emailField));
     emailField.addEventListener("keydown", newContactKeyDownHandler.bind(window, emailField, "email"));
+}
+
+var onClickErase = function(field, event) {
+    field.innerHTML = " ";
 }
 
 var newContactKeyDownHandler = function(field, property, event) {
@@ -185,15 +202,6 @@ var saveEventHandler = function(event) {
             "large": "assets/default-profile.svg",
         }
     }
-    if (newName == undefined) {
-        alert("Você precisa inserir um nome para salvar!")
-    } else if (newPhone == undefined) {
-        alert("Você precisa inserir um número de telefone válido")
-    } else if (newCell == undefined) {
-        alert("Você precisa inserir um celular válido")
-    } else if (newEmail == undefined) {
-        alert("Você precisa inserir um email válido")
-    }
 
     splitNamer(newName, novoContato);
 
@@ -213,7 +221,18 @@ var saveEventHandler = function(event) {
 
     editBtn.classList.add("active");
     contatoAtual = userData[userData.length - 1];
-    turnEditableContent(false);
+
+    if (newName == undefined) {
+        alert("Você precisa inserir um nome para salvar!")
+    } else if (newPhone == undefined) {
+        alert("Você precisa inserir um número de telefone válido")
+    } else if (newCell == undefined) {
+        alert("Você precisa inserir um celular válido")
+    } else if (newEmail == undefined) {
+        alert("Você precisa inserir um email válido")
+    } else {
+        turnEditableContent(false);
+    }
 };
 
 var fillUser = function(data) { // funcao que puxa do JSON e preenche no HTML (parametro - base de dados)// 
@@ -279,7 +298,6 @@ var turnEditableContent = function(boolean) {
     celField.contentEditable = boolean;
     emailField.contentEditable = boolean;
 
-    nameField.focus();
 }
 
 var keydownEventHandler = function(field, property, event) {
@@ -366,8 +384,11 @@ var initializeMap = function() {
 
 var blurEventHandler = function(event) {
     var field = document.querySelector(".search-field");
+    var addNewContact = document.querySelector(".add-btn");
+
     if (event.srcElement.value == "") {
         field.classList.remove("active");
+        addNewContact.classList.add("active");
     }
 }
 
@@ -465,13 +486,15 @@ var inputChangeHandler = function(event) { // funcao pra filtrar os contatos //
     fillContactList(filtered);
 
     var resetBtn = document.querySelector(".reset-btn");
-    var field = document.querySelector(".search-field");
+    var addNewContact = document.querySelector(".add-btn");
 
     if (event.srcElement.value == "") {
         resetBtn.classList.remove("active");
     } else {
         resetBtn.classList.add("active");
     }
+
+    addNewContact.classList.remove("active");
 }
 
 var eraseContactList = function() { //funcao pra limpar os contatos pra filtrar//
