@@ -22,7 +22,7 @@
                     <img src="assets/search.svg">
                 </div>
                 <input class="search-field" type="text" name=" " placeholder="Pesquisar ..." autofocus>
-                
+
                 <div class="add-btn active">
                     <div class="add-bar1 "></div>
                     <div class="add-bar2 "></div>
@@ -31,7 +31,7 @@
                 <div class="reset-btn">
                     <div class="reset-bar1"></div>
                     <div class="reset-bar2"></div>
-                </div>                             
+                </div>
 
                 <img src="assets/user.svg" class="contact_icon">
             </div>
@@ -42,18 +42,29 @@
 
         <div class="person_container">
 
+            <div class="delete-alert">
+                <p>ARE YOU SURE?</p>
+                <div class="delete-buttons">
+                    <button id="no">NO</button>
+                    <button id="yes">YES</button>
+                </div>
+            </div>
+
             <div class="search_button">
                 <img src="assets/search.svg">
             </div>
 
             <div class="data_container">
-                <img src="assets/profile_test.jpg" class="person_photo" >
+                <img src="assets/profile_test.jpg" class="person_photo">
 
-                <img src="assets/pencil.svg" class="edit-icon active">
+                <div class="change-icon">
+                    <img src="assets/pencil.svg" class="edit-icon active">
+                    <img src="assets/trash.svg" class="delete-icon active">
+                </div>
 
                 <div class="person_data">
                     <p class="person_name" class="ellipsis" placeholder="Type something here!">Peggy Rodriquez</p>
-                    <p class="">Financial Analyst</p>                   
+                    <p class="">Financial Analyst</p>
 
                     <div class="tel_container">
                         <!-- <img src="assets/tell.svg"> -->
@@ -87,8 +98,8 @@
             </div>
 
             <div class="newcontact-btn">
-            <button type="button" id="cancel-btn"> CANCELAR </button>
-            <button type="button" id="save-btn"> SALVAR </button>
+                <button type="button" id="cancel-btn"> CANCELAR </button>
+                <button type="button" id="save-btn"> SALVAR </button>
             </div>
 
         </div>
