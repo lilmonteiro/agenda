@@ -167,7 +167,7 @@ a {
     visibility: visible;
 }
 
-.add-btn{
+.add-btn {
     visibility: hidden;
 }
 
@@ -285,14 +285,98 @@ a:active {
     padding: 1em;
     grid-gap: 2em;
     width: auto;
+    opacity: 1;
+    transition: opacity .5s ease-in;
+}
+
+.delete-alert {
+    display: none;
+}
+
+.delete-alert.active {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    background-color: rgb(171, 171, 171);
+    align-self: center;
+    justify-self: center;
+    width: 60%;
+    height: 25%;
+    z-index: 2;
+    border: 1em white solid;
+    border-radius: 1em;
+    grid-column: 1;
+    grid-row: 1;
+    box-shadow: 8px 12px 25px 6px rgba(0, 0, 0, 0.45);
+}
+
+.delete-alert p {
+    color: white;
+    box-sizing: border-box;
+    padding: 1em;
+    font-size: 1.5em;
+    text-align: center;
+    font-weight: 600;
+}
+
+.delete-buttons {
+    display: flex;
+    flex-direction: row;
+    width: auto;
+    justify-content: center;
+}
+
+#no,
+#yes {
+    cursor: pointer;
+    border: unset;
+    border-radius: 0.5em;
+    padding: unset;
+    width: 8em;
+    height: 3em;
+    margin: 1em;
+    margin-top: 0;
+    font-weight: 800;
+    font-size: 1em;
+}
+
+#no {
+    background-color: rgb(162, 29, 29);
+    color: rgb(53, 0, 0);
+}
+
+#no:active {
+    background-color: rgb(94, 9, 9);
+    color: rgb(133, 0, 0);
+}
+
+#yes {
+    background-color: rgb(106, 224, 28);
+    color: rgb(26, 65, 0);
+}
+
+#yes:active {
+    background-color: rgb(40, 101, 0);
+    color: rgb(63, 157, 0);
 }
 
 .person_container.new-contact {
-    background-color: rgb(215, 215, 215);
+    background-color: rgb(184, 184, 184);
     grid-template-columns: 1fr;
     grid-template-rows: auto auto 1fr auto;
     grid-gap: 1em;
     padding-top: 3em;
+    animation: transition 0.3s linear;
+    opacity: 1;
+}
+
+@keyframes transition {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .newcontact-btn {
@@ -339,7 +423,7 @@ a:active {
     position: relative;
     grid-column: 1;
     grid-row: 1/ span 1;
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 1fr 2fr auto;
     grid-template-rows: 1fr;
 }
 
@@ -350,7 +434,13 @@ a:active {
     border-width: 5px;
     border: 5px solid white;
     justify-self: end;
-    width: auto;
+    width: 10em;
+}
+
+.change-icon {
+    display: flex;
+    grid-column: 3;
+    grid-row: 1;
 }
 
 .person_data {
@@ -370,14 +460,17 @@ a:active {
     display: none;
 }
 
-.edit-icon.active {
+.edit-icon.active,
+.delete-icon.active {
     display: grid;
-    justify-self: end;
     grid-column: 1;
     width: 1.5em;
     height: auto;
-    margin: 2em;
-    position: absolute;
+    padding: 0.5em;
+    grid-column: 3;
+    grid-row: 1;
+    align-self: start;
+    cursor: pointer;
 }
 
 .person_name {
@@ -389,7 +482,8 @@ a:active {
 .person_name.newcontact,
 .tel_container.newcontact,
 .wpp_container.newcontact,
-.mail_container.newcontact, .person_data p:nth-child(2).newcontact {
+.mail_container.newcontact,
+.person_data p:nth-child(2).newcontact {
     width: 10em;
     border-style: solid;
     border-width: 0.01em;
@@ -408,8 +502,8 @@ a:active {
     font-style: italic;
 }
 
-.newContactField{
-    width: 10em;   
+.newContactField {
+    width: 10em;
 }
 
 #person_name:focus,
@@ -427,7 +521,6 @@ a:active {
     flex-direction: row;
     justify-self: start;
 }
-
 
 .icon-tel {
     --my-icon: url('assets/tell.svg');
@@ -543,12 +636,10 @@ a:active {
         grid-row: 1;
         z-index: 1;
     }
-
     .person_photo {
         width: 5em;
         justify-self: center;
     }
-
     .search-field {
         width: 100%;
         border-style: solid;
