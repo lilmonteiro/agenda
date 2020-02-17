@@ -1,7 +1,7 @@
 var userData;
 var map;
 var contatoAtual;
-var newName, newBirthday, newPhone, newCell, newEmail;
+var newName, newBirthday, newPhone, newCell, newEmail, newAddress;
 var novoContato;
 
 var inicia = function() {
@@ -33,6 +33,9 @@ var inicia = function() {
     var editBtn = document.querySelector(".edit-icon");
     editBtn.addEventListener("click", editClickEventHandler);
 
+    var deleteBtn = document.querySelector(".delete-icon");
+    deleteBtn.addEventListener("click", deleteClickHandler)
+
     requestJSON('https://randomuser.me/api/?results=100', function(obj) { // Chamando request do banco de dados//
         userData = obj.results;
         userData.sort(compare);
@@ -43,6 +46,16 @@ var inicia = function() {
         phoneMask(userData[0].cell, document.querySelector(".wpp_container p")); // formata do jeito que eu quero agora
         initializeAPI();
     });
+}
+
+var deleteClickHandler = function(event) {
+    var popUp = document.querySelector(".delete-alert");
+    popUp.classList.add("active")
+
+    var optionNo = document.getElementById("no");
+    optionNo.addEventListener("click", function() {
+        popUp.classList.remove("active")
+    })
 }
 
 var compare = function(a, b) {
@@ -63,7 +76,6 @@ var addNewContactHandler = function(event) {
     var personPhoto = document.querySelector(".person_photo");
     var newContactBtn = document.querySelector(".newcontact-btn");
     var editBtn = document.querySelector(".edit-icon");
-
     var nameField = document.querySelector(".person_data p:nth-child(1)");
     var ageField = document.querySelector(".person_data p:nth-child(2)");
     var telField = document.querySelector(".tel_container p");
@@ -72,9 +84,9 @@ var addNewContactHandler = function(event) {
     var celContainer = document.querySelector(".wpp_container");
     var emailField = document.querySelector(".mail_container p");
     var emailContainer = document.querySelector(".mail_container");
+    var addressField = document.querySelector(".local_container p");
 
     personPhoto.src = "assets/default-profile.svg";
-
     personContainer.classList.add("new-contact");
     newContactBtn.classList.add("active");
     editBtn.classList.remove("active");
@@ -88,28 +100,30 @@ var addNewContactHandler = function(event) {
     turnEditableContent(true);
     nameField.blur();
 
-   
     nameField.innerHTML = "Nome";
     ageField.innerHTML = "Data de Nascimento";
     telField.innerHTML = "Telefone";
     celField.innerHTML = "Celular";
     emailField.innerHTML = "E-mail";
+    addressField.innerHTML = "Address";
 
     nameField.addEventListener("click", onClickErase.bind(window, nameField, "name"));
     nameField.addEventListener("keydown", newContactKeyDownHandler.bind(window, nameField, "name"));
-
 
     ageField.addEventListener("click", onClickErase.bind(window, ageField));
     ageField.addEventListener("keydown", newContactKeyDownHandler.bind(window, ageField, "age"));
 
     telField.addEventListener("click", onClickErase.bind(window, telField));
     telField.addEventListener("keydown", newContactKeyDownHandler.bind(window, telField, "phone"));
-    
+
     celField.addEventListener("click", onClickErase.bind(window, celField));
     celField.addEventListener("keydown", newContactKeyDownHandler.bind(window, celField, "cell"));
-    
+
     emailField.addEventListener("click", onClickErase.bind(window, emailField));
     emailField.addEventListener("keydown", newContactKeyDownHandler.bind(window, emailField, "email"));
+
+    addressField.addEventListener("click", onClickErase.bind(window, addressField));
+    addressField.addEventListener("keydown", newContactKeyDownHandler.bind(window, addressField, "address"));
 }
 
 var onClickErase = function(field, event) {
@@ -137,6 +151,8 @@ var newContactKeyDownHandler = function(field, property, event) {
         newCell = event.target.innerHTML;
     } else if (property == "email") {
         newEmail = event.target.innerHTML;
+    } else if (property == "address") {
+        newAddress = event.target.innerHTML;
     }
 }
 
@@ -149,7 +165,6 @@ var cancelEventHandler = function(event) {
     var editBtn = document.querySelector(".edit-icon");
     var personContainer = document.querySelector(".person_container");
     var newContactBtn = document.querySelector(".newcontact-btn");
-
 
     nameField.classList.remove("newcontact");
     ageField.classList.remove("newcontact");
@@ -164,7 +179,7 @@ var cancelEventHandler = function(event) {
     fillUser(contatoAtual);
 };
 
-var saveEventHandler = function(event) {
+var saveEventHandler = function() {
     var nameField = document.querySelector(".person_data p:nth-child(1)");
     var ageField = document.querySelector(".person_data p:nth-child(2)");
     var telContainer = document.querySelector(".tel_container");
@@ -174,6 +189,7 @@ var saveEventHandler = function(event) {
     var personContainer = document.querySelector(".person_container");
     var newContactBtn = document.querySelector(".newcontact-btn");
     var currentYear = new Date().getFullYear();
+    var addressField = document.querySelector(".local_container p");
 
     novoContato = {
         "name": {},
@@ -184,22 +200,9 @@ var saveEventHandler = function(event) {
         "phone": newPhone,
         "cell": newCell,
         "email": newEmail,
-        "location": {
-            "street": {
-                "number": 7155,
-                "name": "Route de Genas"
-            },
-            "city": "Rennes",
-            "state": "Alpes-Maritimes",
-            "country": "France",
-            "postcode": 15159,
-            "coordinates": {
-                "latitude": "-4.9679",
-                "longitude": "-104.9438"
-            },
-        },
+        "location": newAddress,
         "picture": {
-            "large": "assets/default-profile.svg",
+            "large": "assets/default-profile.svg"
         }
     }
 
@@ -236,7 +239,6 @@ var saveEventHandler = function(event) {
 };
 
 var fillUser = function(data) { // funcao que puxa do JSON e preenche no HTML (parametro - base de dados)// 
-
     var nameField = document.querySelector(".person_data p:nth-child(1)");
     nameField.innerHTML = data.name.first + " " + data.name.last;
 
@@ -257,7 +259,11 @@ var fillUser = function(data) { // funcao que puxa do JSON e preenche no HTML (p
     emailField.innerHTML = data.email;
 
     var localField = document.querySelector(".local_container p");
-    localField.innerHTML = data.location.street.number + " " + data.location.street.name;
+    if (data.location.street == undefined) {
+        localField.innerHTML = data.location;
+    } else {
+        localField.innerHTML = data.location.street.number + " " + data.location.street.name;
+    }
 
     var postField = document.querySelector(".post_container p");
     postField.innerHTML = data.location.postcode;
@@ -278,11 +284,13 @@ var editClickEventHandler = function(event) {
     var telField = document.querySelector(".tel_container p");
     var celField = document.querySelector(".wpp_container p");
     var emailField = document.querySelector(".mail_container p");
+    var addressField = document.querySelector(".local_container p");
     nameField.addEventListener("keydown", keydownEventHandler.bind(window, nameField, "name"));
     ageField.addEventListener("keydown", keydownEventHandler.bind(window, ageField, "age"));
     telField.addEventListener("keydown", keydownEventHandler.bind(window, telField, "phone"));
     celField.addEventListener("keydown", keydownEventHandler.bind(window, celField, "cell"));
     emailField.addEventListener("keydown", keydownEventHandler.bind(window, emailField, "email"));
+    addressField.addEventListener("keydown", keydownEventHandler.bind(window, addressField, "address"));
 }
 
 var turnEditableContent = function(boolean) {
@@ -291,13 +299,16 @@ var turnEditableContent = function(boolean) {
     var telField = document.querySelector(".tel_container p");
     var celField = document.querySelector(".wpp_container p");
     var emailField = document.querySelector(".mail_container p");
+    var addressField = document.querySelector(".local_container p");
 
     nameField.contentEditable = boolean;
     ageField.contentEditable = boolean;
     telField.contentEditable = boolean;
     celField.contentEditable = boolean;
     emailField.contentEditable = boolean;
+    addressField.contentEditable = boolean;
 
+    nameField.focus();
 }
 
 var keydownEventHandler = function(field, property, event) {
@@ -309,6 +320,8 @@ var keydownEventHandler = function(field, property, event) {
         field.blur();
         eraseContactList();
         fillContactList(userData);
+        turnEditableContent(false);
+
     } else if (esc) {
         document.execCommand('undo');
         field.blur();
@@ -316,6 +329,7 @@ var keydownEventHandler = function(field, property, event) {
 }
 
 var splitNamer = function(nameToSplit, obj) {
+
     var newNameArray = nameToSplit.split(" ");
     obj.name.first = newNameArray[0];
     obj.name.last = newNameArray[newNameArray.length - 1];
@@ -336,6 +350,8 @@ var editContent = function(property, obj, event) {
         obj.cell = event.target.innerHTML;
     } else if (property == "email") {
         obj.email = event.target.innerHTML;
+    } else if (property == "address") {
+        obj.location = event.target.innerHTML;
     }
 }
 
@@ -375,11 +391,6 @@ var phoneMask = function(number, field) {
     }
 
     field.innerHTML = numeroFormatado;
-}
-
-var initializeMap = function() {
-    initMap(userData[0]);
-
 }
 
 var blurEventHandler = function(event) {
@@ -520,18 +531,45 @@ var requestJSON = function(url, callback) { //Criando request do banco de dados/
     xhr.send('');
 }
 
+var initializeMap = function() {
+    initMap(userData[0]);
+}
+
 var initMap = function(obj) {
     var place = { lat: Number(obj.location.coordinates.latitude), lng: Number(obj.location.coordinates.longitude) };
     var map = new google.maps.Map(
-        document.getElementById('map'), { zoom: 4, center: place });
+        document.getElementById('map'), { zoom: 15, center: place });
     var marker = new google.maps.Marker({ position: place, map: map });
+
+    var geocoder = new google.maps.Geocoder();
+
+    var addressField = document.querySelector(".local_container p");
+    addressField.addEventListener("keydown", geocodeAddress.bind(window, geocoder, map));
 }
 
 var initializeAPI = function() {
-
     var body = document.querySelector("body");
     var scriptContainer = document.createElement("script");
     body.appendChild(scriptContainer);
     var url = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAl8YlkoUka-_WqecEFpCUuatP5Ta7p29E&callback=initializeMap";
     scriptContainer.setAttribute("src", url);
+}
+
+var geocodeAddress = function(geocoder, resultsMap, event) {
+    var enter = event.which == 13;
+
+    if (enter == true) {
+        var address = event.target.innerHTML;
+        geocoder.geocode({ 'address': address }, function(results, status) {
+            if (status === 'OK') {
+                resultsMap.setCenter(results[0].geometry.location);
+                var marker = new google.maps.Marker({
+                    map: resultsMap,
+                    position: results[0].geometry.location
+                });
+            } else {
+                alert('Geocode was not successful for the following reason: ' + status);
+            }
+        })
+    }
 }
