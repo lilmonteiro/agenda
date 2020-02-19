@@ -456,7 +456,7 @@ a:active {
     word-wrap: break-word;
 }
 
-.edit-icon {
+.edit-icon, .delete-icon {
     display: none;
 }
 
