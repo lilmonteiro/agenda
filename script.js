@@ -36,7 +36,7 @@ var inicia = function() {
     var deleteBtn = document.querySelector(".delete-icon");
     deleteBtn.addEventListener("click", deleteClickHandler)
 
-    requestJSON('https://randomuser.me/api/?results=100', function(obj) { // Chamando request do banco de dados//
+    requestJSON('https://randomuser.me/api/?results=10', function(obj) { // Chamando request do banco de dados//
         userData = obj.results;
         userData.sort(compare);
         regExNumbers(userData); // tira a formatacao nativa pra uma string só de numberos
@@ -48,15 +48,6 @@ var inicia = function() {
     });
 }
 
-var deleteClickHandler = function(event) {
-    var popUp = document.querySelector(".delete-alert");
-    popUp.classList.add("active")
-
-    var optionNo = document.getElementById("no");
-    optionNo.addEventListener("click", function() {
-        popUp.classList.remove("active")
-    })
-}
 
 var compare = function(a, b) {
     var iA = a.name.first;
@@ -85,11 +76,13 @@ var addNewContactHandler = function(event) {
     var emailField = document.querySelector(".mail_container p");
     var emailContainer = document.querySelector(".mail_container");
     var addressField = document.querySelector(".local_container p");
+    var deleteBtn = document.querySelector(".delete-icon");
 
     personPhoto.src = "assets/default-profile.svg";
     personContainer.classList.add("new-contact");
     newContactBtn.classList.add("active");
     editBtn.classList.remove("active");
+    deleteBtn.classList.remove("active");
 
     nameField.classList.add("newcontact");
     ageField.classList.add("newcontact");
@@ -165,6 +158,8 @@ var cancelEventHandler = function(event) {
     var editBtn = document.querySelector(".edit-icon");
     var personContainer = document.querySelector(".person_container");
     var newContactBtn = document.querySelector(".newcontact-btn");
+    var deleteBtn = document.querySelector(".delete-icon");
+
 
     nameField.classList.remove("newcontact");
     ageField.classList.remove("newcontact");
@@ -175,6 +170,7 @@ var cancelEventHandler = function(event) {
     personContainer.classList.remove("new-contact");
     newContactBtn.classList.remove("active");
     editBtn.classList.add("active");
+    deleteBtn.classList.add("active");
 
     fillUser(contatoAtual);
 };
@@ -285,12 +281,16 @@ var editClickEventHandler = function(event) {
     var celField = document.querySelector(".wpp_container p");
     var emailField = document.querySelector(".mail_container p");
     var addressField = document.querySelector(".local_container p");
+
     nameField.addEventListener("keydown", keydownEventHandler.bind(window, nameField, "name"));
     ageField.addEventListener("keydown", keydownEventHandler.bind(window, ageField, "age"));
     telField.addEventListener("keydown", keydownEventHandler.bind(window, telField, "phone"));
     celField.addEventListener("keydown", keydownEventHandler.bind(window, celField, "cell"));
     emailField.addEventListener("keydown", keydownEventHandler.bind(window, emailField, "email"));
     addressField.addEventListener("keydown", keydownEventHandler.bind(window, addressField, "address"));
+
+    var deleteBtn = document.querySelector(".delete-icon");
+    deleteBtn.classList.remove("active");
 }
 
 var turnEditableContent = function(boolean) {
@@ -314,17 +314,22 @@ var turnEditableContent = function(boolean) {
 var keydownEventHandler = function(field, property, event) {
     var enter = event.which == 13;
     var esc = event.which == 27;
+    var deleteBtn = document.querySelector(".delete-icon");
 
     if (enter == true) {
         editContent(property, contatoAtual, event);
         field.blur();
         eraseContactList();
         fillContactList(userData);
+        initMap(contatoAtual)
         turnEditableContent(false);
+        deleteBtn.classList.add("active");
 
     } else if (esc) {
         document.execCommand('undo');
+        turnEditableContent(false);
         field.blur();
+        deleteBtn.classList.add("active");        
     }
 }
 
@@ -436,6 +441,7 @@ var regExNumbers = function(objs) {
 }
 
 var itemClickHandler = function(itemObj, event) {
+    eraseContactList();
     fillUser(itemObj)
     initMap(itemObj);
     swipeScreen(false);
@@ -535,16 +541,34 @@ var initializeMap = function() {
     initMap(userData[0]);
 }
 
+
 var initMap = function(obj) {
-    var place = { lat: Number(obj.location.coordinates.latitude), lng: Number(obj.location.coordinates.longitude) };
-    var map = new google.maps.Map(
-        document.getElementById('map'), { zoom: 15, center: place });
-    var marker = new google.maps.Marker({ position: place, map: map });
+    var formattedAddress;
+  
+    if (obj.location.street==undefined) {
+        formattedAddress = obj.location;             
+    } else {
+        formattedAddress = obj.location.street.number + " " + obj.location.street.name; 
+    }
 
-    var geocoder = new google.maps.Geocoder();
+    geocoder = new google.maps.Geocoder();
+    geocoder.geocode({
+        'address': formattedAddress
+    }, function(results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+            var myOptions = {
+                zoom: 18,
+                center: results[0].geometry.location,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            }
+            map = new google.maps.Map(document.getElementById("map"), myOptions);
 
-    var addressField = document.querySelector(".local_container p");
-    addressField.addEventListener("keydown", geocodeAddress.bind(window, geocoder, map));
+            var marker = new google.maps.Marker({
+                map: map,
+                position: results[0].geometry.location
+            });
+        }
+    });
 }
 
 var initializeAPI = function() {
@@ -555,21 +579,25 @@ var initializeAPI = function() {
     scriptContainer.setAttribute("src", url);
 }
 
-var geocodeAddress = function(geocoder, resultsMap, event) {
-    var enter = event.which == 13;
+var deleteClickHandler = function(event) {
+    var popUp = document.querySelector(".delete-alert");
+    popUp.classList.add("active")
 
-    if (enter == true) {
-        var address = event.target.innerHTML;
-        geocoder.geocode({ 'address': address }, function(results, status) {
-            if (status === 'OK') {
-                resultsMap.setCenter(results[0].geometry.location);
-                var marker = new google.maps.Marker({
-                    map: resultsMap,
-                    position: results[0].geometry.location
-                });
-            } else {
-                alert('Geocode was not successful for the following reason: ' + status);
-            }
-        })
-    }
+    var optionNo = document.getElementById("no");
+    optionNo.addEventListener("click", function() {
+        popUp.classList.remove("active")
+    })
+
+    var optionYes = document.getElementById("yes");
+    optionYes.addEventListener("click", yesClickHandler)
+}
+
+var yesClickHandler = function(event) {
+    var popUp = document.querySelector(".delete-alert");
+    var index = userData.findIndex(a => a.phone == contatoAtual.phone);
+    userData.splice(index, 1)
+    fillUser(userData[0]);
+    eraseContactList();
+    fillContactList(userData);
+    popUp.classList.remove("active")
 }
