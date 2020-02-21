@@ -3,6 +3,7 @@ var map;
 var contatoAtual;
 var newName, newBirthday, newPhone, newCell, newEmail, newAddress;
 var novoContato;
+var times = 0;
 
 var inicia = function() {
     var searchButton = document.querySelector(".search_button");
@@ -15,12 +16,13 @@ var inicia = function() {
     contactButton.addEventListener("click", swipeScreen.bind(window, false)); //Mobile - ao clicar no contact swipa a tela//
 
     var addNewContact = document.querySelector(".add-btn");
-    addNewContact.addEventListener("click", addNewContactHandler);
+    addNewContact.addEventListener("click", addNewContactHandler.bind(window, true));
     addNewContact.addEventListener("click", swipeScreen.bind(window, false));
 
     var cancelBtn = document.querySelector("#cancel-btn");
     var saveBtn = document.querySelector("#save-btn");
     cancelBtn.addEventListener("click", cancelEventHandler);
+
     saveBtn.addEventListener("click", saveEventHandler);
 
     var inputCheck = document.querySelector(".search-field ");
@@ -36,7 +38,7 @@ var inicia = function() {
     var deleteBtn = document.querySelector(".delete-icon");
     deleteBtn.addEventListener("click", deleteClickHandler)
 
-    requestJSON('https://randomuser.me/api/?results=10', function(obj) { // Chamando request do banco de dados//
+    requestJSON('https://randomuser.me/api/?results=50', function(obj) { // Chamando request do banco de dados//
         userData = obj.results;
         userData.sort(compare);
         regExNumbers(userData); // tira a formatacao nativa pra uma string só de numberos
@@ -78,6 +80,7 @@ var addNewContactHandler = function(event) {
     var addressField = document.querySelector(".local_container p");
     var deleteBtn = document.querySelector(".delete-icon");
 
+
     personPhoto.src = "assets/default-profile.svg";
     personContainer.classList.add("new-contact");
     newContactBtn.classList.add("active");
@@ -91,7 +94,6 @@ var addNewContactHandler = function(event) {
     emailContainer.classList.add("newcontact");
 
     turnEditableContent(true);
-    nameField.blur();
 
     nameField.innerHTML = "Nome";
     ageField.innerHTML = "Data de Nascimento";
@@ -100,34 +102,37 @@ var addNewContactHandler = function(event) {
     emailField.innerHTML = "E-mail";
     addressField.innerHTML = "Address";
 
-    nameField.addEventListener("click", onClickErase.bind(window, nameField, "name"));
     nameField.addEventListener("keydown", newContactKeyDownHandler.bind(window, nameField, "name"));
 
-    ageField.addEventListener("click", onClickErase.bind(window, ageField));
     ageField.addEventListener("keydown", newContactKeyDownHandler.bind(window, ageField, "age"));
 
-    telField.addEventListener("click", onClickErase.bind(window, telField));
     telField.addEventListener("keydown", newContactKeyDownHandler.bind(window, telField, "phone"));
 
-    celField.addEventListener("click", onClickErase.bind(window, celField));
     celField.addEventListener("keydown", newContactKeyDownHandler.bind(window, celField, "cell"));
 
-    emailField.addEventListener("click", onClickErase.bind(window, emailField));
     emailField.addEventListener("keydown", newContactKeyDownHandler.bind(window, emailField, "email"));
 
-    addressField.addEventListener("click", onClickErase.bind(window, addressField));
     addressField.addEventListener("keydown", newContactKeyDownHandler.bind(window, addressField, "address"));
+
 }
 
-var onClickErase = function(field, event) {
-    field.innerHTML = " ";
-}
 
 var newContactKeyDownHandler = function(field, property, event) {
+    var tab = event.which === 9;        
+    if (times == 1) {
+        field.innerHTML = " ";
+    }
+    times = times + 1; // acrescenta mais um
+
+    if (tab) {
+        console.log(times)
+        times=1; // reinicia a variavel 
+    }    
+
     var enter = event.which == 13;
     var esc = event.which == 27;
 
-    if (enter == true) {
+    if (enter) {
         field.blur();
     } else if (esc) {
         document.execCommand('undo');
@@ -152,27 +157,34 @@ var newContactKeyDownHandler = function(field, property, event) {
 var cancelEventHandler = function(event) {
     var nameField = document.querySelector(".person_data p:nth-child(1)");
     var ageField = document.querySelector(".person_data p:nth-child(2)");
+    var telField = document.querySelector(".tel_container p");
+    var celField = document.querySelector(".wpp_container p");
+    var emailField = document.querySelector(".mail_container p");
+    var addressField = document.querySelector(".local_container p");
+
     var telContainer = document.querySelector(".tel_container");
     var celContainer = document.querySelector(".wpp_container");
     var emailContainer = document.querySelector(".mail_container");
-    var editBtn = document.querySelector(".edit-icon");
     var personContainer = document.querySelector(".person_container");
+
+    var editBtn = document.querySelector(".edit-icon");
     var newContactBtn = document.querySelector(".newcontact-btn");
     var deleteBtn = document.querySelector(".delete-icon");
 
-
     nameField.classList.remove("newcontact");
     ageField.classList.remove("newcontact");
+
+    personContainer.classList.remove("new-contact");
     telContainer.classList.remove("newcontact");
     celContainer.classList.remove("newcontact");
     emailContainer.classList.remove("newcontact");
 
-    personContainer.classList.remove("new-contact");
     newContactBtn.classList.remove("active");
     editBtn.classList.add("active");
     deleteBtn.classList.add("active");
 
     fillUser(contatoAtual);
+    turnEditableContent(false);
 };
 
 var saveEventHandler = function() {
@@ -329,7 +341,7 @@ var keydownEventHandler = function(field, property, event) {
         document.execCommand('undo');
         turnEditableContent(false);
         field.blur();
-        deleteBtn.classList.add("active");        
+        deleteBtn.classList.add("active");
     }
 }
 
@@ -544,11 +556,11 @@ var initializeMap = function() {
 
 var initMap = function(obj) {
     var formattedAddress;
-  
-    if (obj.location.street==undefined) {
-        formattedAddress = obj.location;             
+
+    if (obj.location.street == undefined) {
+        formattedAddress = obj.location;
     } else {
-        formattedAddress = obj.location.street.number + " " + obj.location.street.name; 
+        formattedAddress = obj.location.street.number + " " + obj.location.street.name;
     }
 
     geocoder = new google.maps.Geocoder();
@@ -580,24 +592,13 @@ var initializeAPI = function() {
 }
 
 var deleteClickHandler = function(event) {
-    var popUp = document.querySelector(".delete-alert");
-    popUp.classList.add("active")
+    var confirmPopUp = confirm("Are you sure?");
 
-    var optionNo = document.getElementById("no");
-    optionNo.addEventListener("click", function() {
-        popUp.classList.remove("active")
-    })
-
-    var optionYes = document.getElementById("yes");
-    optionYes.addEventListener("click", yesClickHandler)
-}
-
-var yesClickHandler = function(event) {
-    var popUp = document.querySelector(".delete-alert");
-    var index = userData.findIndex(a => a.phone == contatoAtual.phone);
-    userData.splice(index, 1)
-    fillUser(userData[0]);
-    eraseContactList();
-    fillContactList(userData);
-    popUp.classList.remove("active")
+    if (confirmPopUp == true) {
+        var index = userData.findIndex(a => a.phone == contatoAtual.phone);
+        userData.splice(index, 1)
+        fillUser(userData[0]);
+        eraseContactList();
+        fillContactList(userData);
+    }
 }
