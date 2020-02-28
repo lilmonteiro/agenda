@@ -4,6 +4,9 @@ var contatoAtual;
 var newName, newBirthday, newPhone, newCell, newEmail, newAddress;
 var novoContato;
 var times = 0;
+var objData, objsrt, objTeste;
+var saveDataLocalStorage;
+
 
 var inicia = function() {
     var searchButton = document.querySelector(".search_button");
@@ -22,7 +25,6 @@ var inicia = function() {
     var cancelBtn = document.querySelector("#cancel-btn");
     var saveBtn = document.querySelector("#save-btn");
     cancelBtn.addEventListener("click", cancelEventHandler);
-
     saveBtn.addEventListener("click", saveEventHandler);
 
     var inputCheck = document.querySelector(".search-field ");
@@ -38,9 +40,11 @@ var inicia = function() {
     var deleteBtn = document.querySelector(".delete-icon");
     deleteBtn.addEventListener("click", deleteClickHandler)
 
-    requestJSON('https://randomuser.me/api/?results=50', function(obj) { // Chamando request do banco de dados//
+    requestJSON('https://randomuser.me/api/?nat=BR&results=10', function(obj) { // Chamando request do banco de dados//
         userData = obj.results;
-        userData.sort(compare);
+        userData = localStorage.getItem("dataObj"); // userData é puxado do localStorage
+        userData = JSON.parse(userData) // userData volta a ser objeto e nao string
+        userData.sort(compare); // Ordem alfabetica
         regExNumbers(userData); // tira a formatacao nativa pra uma string só de numberos
         fillUser(userData[0]); // Puxa o primeiro usuário // 
         fillContactList(userData); // Na primeira vez, puxa a lista com TODOS os contatos
@@ -50,6 +54,11 @@ var inicia = function() {
     });
 }
 
+saveDataLocalStorage = function() {
+    objData = userData
+    objsrt = JSON.stringify(objData);
+    localStorage.setItem("dataObj", objsrt);
+}
 
 var compare = function(a, b) {
     var iA = a.name.first;
@@ -116,18 +125,16 @@ var addNewContactHandler = function(event) {
 
 }
 
-
 var newContactKeyDownHandler = function(field, property, event) {
-    var tab = event.which === 9;        
+    var tab = event.which === 9;
     if (times == 1) {
         field.innerHTML = " ";
     }
     times = times + 1; // acrescenta mais um
 
     if (tab) {
-        console.log(times)
-        times=1; // reinicia a variavel 
-    }    
+        times = 1; // reinicia a variavel 
+    }
 
     var enter = event.which == 13;
     var esc = event.which == 27;
@@ -244,9 +251,24 @@ var saveEventHandler = function() {
     } else {
         turnEditableContent(false);
     }
+
+    userDataStr = JSON.stringify(userData);
+    localStorage.setItem("dataObj", userDataStr)
 };
 
+var splitNamer = function(nameToSplit, obj) {
+    var newNameArray = nameToSplit.split(" ");
+    if (newNameArray.length == 1) {
+        obj.name.first = newNameArray[0];
+        obj.name.last = "";
+    } else if (newNameArray.length>1) {
+        obj.name.first = newNameArray[0];
+        obj.name.last = newNameArray[newNameArray.length - 1];
+    }
+}
+
 var fillUser = function(data) { // funcao que puxa do JSON e preenche no HTML (parametro - base de dados)// 
+
     var nameField = document.querySelector(".person_data p:nth-child(1)");
     nameField.innerHTML = data.name.first + " " + data.name.last;
 
@@ -345,16 +367,7 @@ var keydownEventHandler = function(field, property, event) {
     }
 }
 
-var splitNamer = function(nameToSplit, obj) {
 
-    var newNameArray = nameToSplit.split(" ");
-    obj.name.first = newNameArray[0];
-    obj.name.last = newNameArray[newNameArray.length - 1];
-
-    if (newNameArray[0] == newNameArray[1]) {
-        obj.name.last = "";
-    }
-}
 
 var editContent = function(property, obj, event) {
     if (property == "name") {
@@ -370,6 +383,9 @@ var editContent = function(property, obj, event) {
     } else if (property == "address") {
         obj.location = event.target.innerHTML;
     }
+
+    var userDataStr = JSON.stringify(userData)
+    localStorage.setItem("dataObj", userDataStr);
 }
 
 var phoneMask = function(number, field) {
@@ -553,7 +569,6 @@ var initializeMap = function() {
     initMap(userData[0]);
 }
 
-
 var initMap = function(obj) {
     var formattedAddress;
 
@@ -597,6 +612,8 @@ var deleteClickHandler = function(event) {
     if (confirmPopUp == true) {
         var index = userData.findIndex(a => a.phone == contatoAtual.phone);
         userData.splice(index, 1)
+        var userDataStr = JSON.stringify(userData)
+        localStorage.setItem("dataObj", userDataStr)
         fillUser(userData[0]);
         eraseContactList();
         fillContactList(userData);
