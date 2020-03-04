@@ -599,6 +599,31 @@ a:active {
     width: auto;
 }
 
+.savecache{
+margin-top: -50px;
+}
+
+.map-alert-cnt{
+background-color: #cecece;
+}
+
+.offline{
+    visibility: hidden;
+    display: none;
+}
+
+.map-alert{
+    visibility: visible;
+    display: block;
+    font-weight: 800;
+    font-size: 2.5em;
+    text-align: center;
+    color: #888888;
+    box-sizing: border-box;
+    padding: 2em; 
+    margin: auto;
+}
+
 @media (max-width: 600px) {
     html {
         overflow: hidden;
