@@ -40,18 +40,39 @@ var inicia = function() {
     var deleteBtn = document.querySelector(".delete-icon");
     deleteBtn.addEventListener("click", deleteClickHandler)
 
-    requestJSON('https://randomuser.me/api/?nat=BR&results=10', function(obj) { // Chamando request do banco de dados//
-        userData = obj.results;
-        userData = localStorage.getItem("dataObj"); // userData é puxado do localStorage
+    //verifica se ja existem dados salvos locais
+    userData = localStorage.getItem("dataObj");
+    if (userData != null) {
+        // userData é puxado do localStorage
         userData = JSON.parse(userData) // userData volta a ser objeto e nao string
-        userData.sort(compare); // Ordem alfabetica
-        regExNumbers(userData); // tira a formatacao nativa pra uma string só de numberos
-        fillUser(userData[0]); // Puxa o primeiro usuário // 
-        fillContactList(userData); // Na primeira vez, puxa a lista com TODOS os contatos
-        phoneMask(userData[0].phone, document.querySelector(".tel_container p")); // formata do jeito que eu quero agora
-        phoneMask(userData[0].cell, document.querySelector(".wpp_container p")); // formata do jeito que eu quero agora
-        initializeAPI();
-    });
+        setupData();
+    } else {      
+        try {
+            requestJSON('https://randomuser.me/api/?nat=BR&results=50', function(obj) { // Chamando request do banco de dados//        
+                userData = obj.results;
+                userData = JSON.parse(userData) // userData volta a ser objeto e nao string
+                userData.sort(compare); // Ordem alfabetica
+                regExNumbers(userData); // tira a formatacao nativa pra uma string só de numberos
+                setupData();
+            });
+        } catch (error) {
+            console.log(1)
+        }
+    }
+}
+
+var setupData = function() {
+    fillUser(userData[0]); // Puxa o primeiro usuário // 
+    fillContactList(userData); // Na primeira vez, puxa a lista com TODOS os contatos
+    phoneMask(userData[0].phone, document.querySelector(".tel_container p")); // formata do jeito que eu quero agora
+    phoneMask(userData[0].cell, document.querySelector(".wpp_container p")); // formata do jeito que eu quero agora
+    initializeAPI();
+}
+
+var saveCacheEventHandler = function(event) {
+    var html = document.querySelector("html");
+    html.setAttribute("manifest", "cache.appcache")
+    window.location.reload()
 }
 
 saveDataLocalStorage = function() {
@@ -112,17 +133,11 @@ var addNewContactHandler = function(event) {
     addressField.innerHTML = "Address";
 
     nameField.addEventListener("keydown", newContactKeyDownHandler.bind(window, nameField, "name"));
-
     ageField.addEventListener("keydown", newContactKeyDownHandler.bind(window, ageField, "age"));
-
     telField.addEventListener("keydown", newContactKeyDownHandler.bind(window, telField, "phone"));
-
     celField.addEventListener("keydown", newContactKeyDownHandler.bind(window, celField, "cell"));
-
     emailField.addEventListener("keydown", newContactKeyDownHandler.bind(window, emailField, "email"));
-
     addressField.addEventListener("keydown", newContactKeyDownHandler.bind(window, addressField, "address"));
-
 }
 
 var newContactKeyDownHandler = function(field, property, event) {
@@ -261,14 +276,13 @@ var splitNamer = function(nameToSplit, obj) {
     if (newNameArray.length == 1) {
         obj.name.first = newNameArray[0];
         obj.name.last = "";
-    } else if (newNameArray.length>1) {
+    } else if (newNameArray.length > 1) {
         obj.name.first = newNameArray[0];
         obj.name.last = newNameArray[newNameArray.length - 1];
     }
 }
 
 var fillUser = function(data) { // funcao que puxa do JSON e preenche no HTML (parametro - base de dados)// 
-
     var nameField = document.querySelector(".person_data p:nth-child(1)");
     nameField.innerHTML = data.name.first + " " + data.name.last;
 
@@ -366,8 +380,6 @@ var keydownEventHandler = function(field, property, event) {
         deleteBtn.classList.add("active");
     }
 }
-
-
 
 var editContent = function(property, obj, event) {
     if (property == "name") {
@@ -555,12 +567,24 @@ var eraseContactList = function() { //funcao pra limpar os contatos pra filtrar/
 var requestJSON = function(url, callback) { //Criando request do banco de dados//
     var xhr = new XMLHttpRequest();
 
-    xhr.onreadystatechange = function() {
+    // xhr.onerror = function() { // offline 
+    //     if (xhr.status === 0) {
+    //         var obj = JSON.parse(localStorage.getItem("dataObj"));
+    //         callback(obj);
+    //     }
+    // }   
+
+    xhr.onreadystatechange = function() {     
         if (xhr.readyState === 4) {
-            var obj = JSON.parse(xhr.responseText);
-            callback(obj);
+            if (xhr.responseText == 0) {                
+                var obj = localStorage.getItem("dataObj");
+            } else {
+                var obj = JSON.parse(xhr.responseText);
+                callback(obj);
+            }
         }
     }
+
     xhr.open('GET', url, true);
     xhr.send('');
 }
@@ -569,34 +593,44 @@ var initializeMap = function() {
     initMap(userData[0]);
 }
 
-var initMap = function(obj) {
+var initMap = function(obj, boolean) {
     var formattedAddress;
-
     if (obj.location.street == undefined) {
         formattedAddress = obj.location;
     } else {
         formattedAddress = obj.location.street.number + " " + obj.location.street.name;
     }
-
     geocoder = new google.maps.Geocoder();
     geocoder.geocode({
         'address': formattedAddress
+
     }, function(results, status) {
+
         if (status == google.maps.GeocoderStatus.OK) {
+            var mapContainer = document.getElementById("map");
+            mapContainer.classList.remove("map-alert-cnt")
+            var alert = document.createElement("p");
+            alert.classList.remove("map-alert")
+
             var myOptions = {
                 zoom: 18,
                 center: results[0].geometry.location,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             }
             map = new google.maps.Map(document.getElementById("map"), myOptions);
-
             var marker = new google.maps.Marker({
                 map: map,
                 position: results[0].geometry.location
             });
+        } else if (status == google.maps.GeocoderStatus.ERROR) {
+            var mapContainer = document.getElementById("map");
+            mapContainer.classList.add("map-alert-cnt")
+            var alert = document.createElement("p");
+            alert.classList.add("map-alert")
         }
     });
 }
+
 
 var initializeAPI = function() {
     var body = document.querySelector("body");
@@ -604,6 +638,7 @@ var initializeAPI = function() {
     body.appendChild(scriptContainer);
     var url = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAl8YlkoUka-_WqecEFpCUuatP5Ta7p29E&callback=initializeMap";
     scriptContainer.setAttribute("src", url);
+
 }
 
 var deleteClickHandler = function(event) {
