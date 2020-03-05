@@ -1,0 +1,29 @@
+CACHE MANIFEST
+# 03032020.v1
+
+CACHE:
+agenda.html
+style.css
+assets/wpp.svg
+assets/tell.svg
+assets/share.svg
+assets/search.svg
+assets/post.svg
+assets/map.svg
+assets/local.svg
+assets/initial_bg.svg
+assets/edit.svg
+assets/Asset-11.svg
+assets/arroba.svg
+assets/profile_test.jpg
+assets/user.svg
+assets/default-profile.svg
+assets/pencil.svg
+assets/trash.svg
+cache.appcache
+script.js
+
+NETWORK:
+
+
+
