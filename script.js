@@ -7,7 +7,6 @@ var times = 0;
 var objData, objsrt, objTeste;
 var saveDataLocalStorage;
 
-
 var inicia = function() {
     var searchButton = document.querySelector(".search_button");
     searchButton.addEventListener("click", swipeScreen.bind(window, true)); //Mobile - ao clicar na lupa swipa a tela//
@@ -42,22 +41,22 @@ var inicia = function() {
 
     //verifica se ja existem dados salvos locais
     userData = localStorage.getItem("dataObj");
-    if (userData != null) {
-        // userData é puxado do localStorage
+    if (userData != null) { // userData é puxado do localStorage
         userData = JSON.parse(userData) // userData volta a ser objeto e nao string
         setupData();
-    } else {      
-        try {
-            requestJSON('https://randomuser.me/api/?nat=BR&results=50', function(obj) { // Chamando request do banco de dados//        
+    } else {
+        requestJSON('https://randomuser.me/api/?nat=BR&results=50',
+            function(obj) { // Chamando request do banco de dados//        
                 userData = obj.results;
-                userData = JSON.parse(userData) // userData volta a ser objeto e nao string
                 userData.sort(compare); // Ordem alfabetica
                 regExNumbers(userData); // tira a formatacao nativa pra uma string só de numberos
                 setupData();
-            });
-        } catch (error) {
-            console.log(1)
-        }
+                saveDataLocalStorage();
+            },
+            function(){
+                alert("No internet connection to load your contact list.")
+            }
+        );
     }
 }
 
@@ -564,25 +563,21 @@ var eraseContactList = function() { //funcao pra limpar os contatos pra filtrar/
 
 }
 
-var requestJSON = function(url, callback) { //Criando request do banco de dados//
+var requestJSON = function(url, successCallback, errorCallback) { //Criando request do banco de dados//
     var xhr = new XMLHttpRequest();
 
-    // xhr.onerror = function() { // offline 
-    //     if (xhr.status === 0) {
-    //         var obj = JSON.parse(localStorage.getItem("dataObj"));
-    //         callback(obj);
-    //     }
-    // }   
-
-    xhr.onreadystatechange = function() {     
-        if (xhr.readyState === 4) {
-            if (xhr.responseText == 0) {                
-                var obj = localStorage.getItem("dataObj");
-            } else {
-                var obj = JSON.parse(xhr.responseText);
-                callback(obj);
-            }
+    xhr.onerror = function() { // offline 
+        if(errorCallback && errorCallback.constructor == Function){
+            errorCallback(false);
+        }else{
+            console.error("Variavel de callback de error não é uma função válida.")
         }
+        
+    }
+
+    xhr.onload = function() {
+        var obj = JSON.parse(xhr.responseText);
+        successCallback(obj);
     }
 
     xhr.open('GET', url, true);
