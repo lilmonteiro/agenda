@@ -53,7 +53,7 @@ var inicia = function() {
                 setupData();
                 saveDataLocalStorage();
             },
-            function(){
+            function() {
                 alert("No internet connection to load your contact list.")
             }
         );
@@ -567,12 +567,11 @@ var requestJSON = function(url, successCallback, errorCallback) { //Criando requ
     var xhr = new XMLHttpRequest();
 
     xhr.onerror = function() { // offline 
-        if(errorCallback && errorCallback.constructor == Function){
+        if (errorCallback && errorCallback.constructor == Function) {
             errorCallback(false);
-        }else{
+        } else {
             console.error("Variavel de callback de error não é uma função válida.")
         }
-        
     }
 
     xhr.onload = function() {
@@ -595,18 +594,19 @@ var initMap = function(obj, boolean) {
     } else {
         formattedAddress = obj.location.street.number + " " + obj.location.street.name;
     }
+
+ 
+    var teste = 0;
     geocoder = new google.maps.Geocoder();
+  
     geocoder.geocode({
         'address': formattedAddress
 
     }, function(results, status) {
-
         if (status == google.maps.GeocoderStatus.OK) {
             var mapContainer = document.getElementById("map");
             mapContainer.classList.remove("map-alert-cnt")
-            var alert = document.createElement("p");
-            alert.classList.remove("map-alert")
-
+           
             var myOptions = {
                 zoom: 18,
                 center: results[0].geometry.location,
@@ -617,10 +617,13 @@ var initMap = function(obj, boolean) {
                 map: map,
                 position: results[0].geometry.location
             });
+
         } else if (status == google.maps.GeocoderStatus.ERROR) {
+            console.log(status)
             var mapContainer = document.getElementById("map");
             mapContainer.classList.add("map-alert-cnt")
-            var alert = document.createElement("p");
+            var alert = document.querySelector(".offline");
+            alert.classList.remove("offline")
             alert.classList.add("map-alert")
         }
     });
