@@ -1,3 +1,6 @@
+import { ListItemContainer } from "./components/ListItemContainer.js"
+import { GoogleMapsApi } from './components/google-maps-api.js';
+
 var userData;
 var map;
 var contatoAtual;
@@ -6,6 +9,7 @@ var novoContato;
 var times = 0;
 var objData, objsrt, objTeste;
 var saveDataLocalStorage;
+
 
 var inicia = function() {
     var searchButton = document.querySelector(".search_button");
@@ -60,12 +64,14 @@ var inicia = function() {
     }
 }
 
+
+
 var setupData = function() {
     fillUser(userData[0]); // Puxa o primeiro usuário // 
     fillContactList(userData); // Na primeira vez, puxa a lista com TODOS os contatos
     phoneMask(userData[0].phone, document.querySelector(".tel_container p")); // formata do jeito que eu quero agora
     phoneMask(userData[0].cell, document.querySelector(".wpp_container p")); // formata do jeito que eu quero agora
-    initializeAPI();
+    initializeAPI(userData[0]);
 }
 
 var saveCacheEventHandler = function(event) {
@@ -368,7 +374,7 @@ var keydownEventHandler = function(field, property, event) {
         field.blur();
         eraseContactList();
         fillContactList(userData);
-        initMap(contatoAtual)
+        initializeAPI(contatoAtual)
         turnEditableContent(false);
         deleteBtn.classList.add("active");
 
@@ -482,7 +488,7 @@ var regExNumbers = function(objs) {
 var itemClickHandler = function(itemObj, event) {
     eraseContactList();
     fillUser(itemObj)
-    initMap(itemObj);
+    initializeAPI(itemObj);
     swipeScreen(false);
 
     var resetBtn = document.querySelector(".reset-btn");
@@ -583,60 +589,40 @@ var requestJSON = function(url, successCallback, errorCallback) { //Criando requ
     xhr.send('');
 }
 
-var initializeMap = function() {
-    initMap(userData[0]);
-}
 
-var initMap = function(obj, boolean) {
-    var formattedAddress;
-    if (obj.location.street == undefined) {
-        formattedAddress = obj.location;
-    } else {
-        formattedAddress = obj.location.street.number + " " + obj.location.street.name;
-    }
+var initializeAPI = function(obj) { //new function to display my Map, that avoid a lot of code lines
 
- 
-    var teste = 0;
-    geocoder = new google.maps.Geocoder();
-  
-    geocoder.geocode({
-        'address': formattedAddress
+    const gmapApi = new GoogleMapsApi(); // initialize the api
+    gmapApi.load().then(() => { // on api load do the following things
+        let map = new google.maps.Map(document.querySelector('#map'), { // insert the map inside a div
+            zoom:18 // you must to set a zoom to display the map
+        });
 
-    }, function(results, status) {
-        if (status == google.maps.GeocoderStatus.OK) {
-            var mapContainer = document.getElementById("map");
-            mapContainer.classList.remove("map-alert-cnt")
-           
-            var myOptions = {
-                zoom: 18,
-                center: results[0].geometry.location,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            }
-            map = new google.maps.Map(document.getElementById("map"), myOptions);
-            var marker = new google.maps.Marker({
-                map: map,
-                position: results[0].geometry.location
-            });
-
-        } else if (status == google.maps.GeocoderStatus.ERROR) {
-            console.log(status)
-            var mapContainer = document.getElementById("map");
-            mapContainer.classList.add("map-alert-cnt")
-            var alert = document.querySelector(".offline");
-            alert.classList.remove("offline")
-            alert.classList.add("map-alert")
+        var formattedAddress; // variable to use a formatted address version
+        if (obj.location.street == undefined) { //if you edit the contact address, this is the new structure
+            formattedAddress = obj.location;
+        } else { // else keep the last settings of object location/address
+            formattedAddress = obj.location.street.number + " " + obj.location.street.name;
         }
+
+        var geocoder = new google.maps.Geocoder(); //initialize geocode to geocode the string address to lat lng format
+        geocoder.geocode({
+            'address': formattedAddress // parameter that get the address
+
+        }, function(results, status) {         
+            let center = {                
+                lat:results[0].geometry.location.lat(), // current contact location 
+                lng:results[0].geometry.location.lng()
+            }
+            map.setCenter(center); // set the new center from the current contact
+            
+            var marker = new google.maps.Marker({ // initialize a new market
+                position: center,
+            });
+            marker.setMap(map) // set which map needs to insert the marker
+
+        });
     });
-}
-
-
-var initializeAPI = function() {
-    var body = document.querySelector("body");
-    var scriptContainer = document.createElement("script");
-    body.appendChild(scriptContainer);
-    var url = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAl8YlkoUka-_WqecEFpCUuatP5Ta7p29E&callback=initializeMap";
-    scriptContainer.setAttribute("src", url);
-
 }
 
 var deleteClickHandler = function(event) {
@@ -652,3 +638,5 @@ var deleteClickHandler = function(event) {
         fillContactList(userData);
     }
 }
+
+window.addEventListener("load", inicia);
