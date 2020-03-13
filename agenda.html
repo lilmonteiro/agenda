@@ -6,12 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script type="text/javascript" src="script.js"></script>
-    <title>Agenda</title>
+    <script src="script.js" type="module"> </script>
+    <title> Agenda </title>
 </head>
 
-<body onload="inicia()">
-  
+
+<body>
+
     <div class="window_container">
 
         <div class="container_contatos">
@@ -59,7 +60,7 @@
 
                 <div class="change-icon">
                     <img src="assets/trash.svg" class="delete-icon active">
-                    <img src="assets/pencil.svg" class="edit-icon active">                    
+                    <img src="assets/pencil.svg" class="edit-icon active">
                 </div>
 
                 <div class="person_data">
@@ -94,8 +95,8 @@
                 </div>
             </div>
 
-            <div id="map" class="map-alert-cnt">
-                <p class="offline map-alert">⚠️ <br> You must be online to access the map</p>
+            <div id="map" class="">
+                <p class="offline ">⚠️ <br> You must be online to access the map</p>
             </div>
 
             <div class="newcontact-btn">
@@ -105,7 +106,14 @@
 
         </div>
     </div>
+
+
 </body>
 
+<!-- <script>
+    let listItemCont = document.createElement("list-item-container")
+    document.querySelector(".contact_list").appendChild(listItemCont)
+    listItemCont.innerHTML = "hello"
+</script> -->
 
 </html>
