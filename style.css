@@ -226,53 +226,11 @@ a:active {
     grid-row: 2/ span 1;
     border-radius: 0 0 10px 10px;
     width: 100%;
-    cursor: pointer;
     overflow: scroll;
     overflow-x: hidden;
 }
 
-.contact_list a {
-    width: 100%;
-    position: relative;
-}
 
-.contact_list a:hover {
-    background-color: rgb(220, 220, 220);
-}
-
-.contact_list a:active {
-    background-color: rgb(114, 114, 114);
-    color: white;
-}
-
-.contact_list p,
-.contact_name p {
-    padding: 1em;
-    padding: 1em;
-    margin: 0;
-}
-
-.contact_initial {
-    display: flex;
-    position: absolute;
-    background-image: url(assets/initial_bg.svg);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 30px;
-    left: 1em;
-    color: white;
-}
-
-.contact_name {
-    display: flex;
-    position: relative;
-    left: 50px;
-}
-
-.ellipsis {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
 
 .person_container {
     display: grid;
@@ -480,10 +438,10 @@ a:active {
     word-wrap: break-word;
 }
 
-.person_name.newcontact,
-.tel_container.newcontact,
-.wpp_container.newcontact,
-.mail_container.newcontact,
+/* .person_name.newcontact,
+.cell_container.newcontact,
+.tell_container.newcontact,
+.email_container.newcontact,
 .person_data p:nth-child(2).newcontact {
     width: 10em;
     border-style: solid;
@@ -495,59 +453,26 @@ a:active {
     margin-bottom: 0.2em;
     background-color: white;
     color: rgb(126, 126, 126);
+} */
+
+.newcontact{
+    width: 25vw;
+    border-style: solid;
+    border-width: 0.01em;
+    /* border-color: #888888; */
+    border-radius: 0.25em;
+    padding: 0.2em;
+    padding-top: 0;
+    margin-bottom: 0.2em;
+    margin-left: 2vw;
+    background-color: #c9c9c9;
+    /* opacity: .2; */
+    color: #595959;
 }
 
-.person_name.newcontact::placeholder {
-    color: red;
-    font-size: 1.2em;
-    font-style: italic;
-}
-
-.newContactField {
-    width: 10em;
-}
-
-#person_name:focus,
-.person_data p:focus,
-.tel_container p:focus,
-.wpp_container p:focus,
-.mail_container p:focus {
+.newcontact:focus{
     background-color: rgb(255, 255, 255);
-}
 
-.tel_container,
-.wpp_container,
-.mail_container {
-    display: flex;
-    flex-direction: row;
-    justify-self: start;
-}
-
-.icon-tel {
-    --my-icon: url('assets/tell.svg');
-}
-
-.icon-wpp {
-    --my-icon: url('assets/wpp.svg');
-}
-
-.icon-arroba {
-    --my-icon: url('assets/arroba.svg');
-}
-
-.label-icon:before {
-    content: "";
-    background-image: var(--my-icon);
-    background-repeat: no-repeat;
-    background-position: center center;
-    align-self: center;
-    float: left;
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    top: .05em;
-    position: relative;
-    margin-right: .5em;
 }
 
 .tel_container p:nth-of-type(1) {
