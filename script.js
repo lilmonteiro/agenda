@@ -1,15 +1,14 @@
-import { ListItemContainer } from "./components/ListItemContainer.js"
+import { ListItemContainer } from "./components/ListItemContainer.js";
+import { ContactDataContainer } from "./components/ContactDataContainer.js";
 import { GoogleMapsApi } from './components/google-maps-api.js';
 
 var userData;
-var map;
 var contatoAtual;
-var newName, newBirthday, newPhone, newCell, newEmail, newAddress;
+var newName, birthYear, newPhone, newCell, newEmail, newAddress;
 var novoContato;
 var times = 0;
-var objData, objsrt, objTeste;
+var objData, objsrt;
 var saveDataLocalStorage;
-
 
 var inicia = function() {
     var searchButton = document.querySelector(".search_button");
@@ -45,18 +44,23 @@ var inicia = function() {
 
     //verifica se ja existem dados salvos locais
     userData = localStorage.getItem("dataObj");
-    if (userData != null) { // userData é puxado do localStorage
+    if (userData != null && userData != "null") { // userData é puxado do localStorage
         userData = JSON.parse(userData) // userData volta a ser objeto e nao string
         setupData();
     } else {
-        requestJSON('https://randomuser.me/api/?nat=BR&results=50',
-            function(obj) { // Chamando request do banco de dados//        
+        requestJSON(
+            // 'https://randomuser.me/api/?nat=BR&results=50',
+            'data_sample.json',
+
+            function(obj) { // Chamando request do banco de dados//    
+                console.log(obj)
                 userData = obj.results;
                 userData.sort(compare); // Ordem alfabetica
                 regExNumbers(userData); // tira a formatacao nativa pra uma string só de numberos
                 setupData();
                 saveDataLocalStorage();
             },
+
             function() {
                 alert("No internet connection to load your contact list.")
             }
@@ -64,13 +68,9 @@ var inicia = function() {
     }
 }
 
-
-
 var setupData = function() {
-    fillUser(userData[0]); // Puxa o primeiro usuário // 
+    fillUser(userData[0], true); // Puxa o primeiro usuário // 
     fillContactList(userData); // Na primeira vez, puxa a lista com TODOS os contatos
-    phoneMask(userData[0].phone, document.querySelector(".tel_container p")); // formata do jeito que eu quero agora
-    phoneMask(userData[0].cell, document.querySelector(".wpp_container p")); // formata do jeito que eu quero agora
     initializeAPI(userData[0]);
 }
 
@@ -80,11 +80,12 @@ var saveCacheEventHandler = function(event) {
     window.location.reload()
 }
 
-saveDataLocalStorage = function() {
+var saveDataLocalStorage = function() {
     objData = userData
     objsrt = JSON.stringify(objData);
     localStorage.setItem("dataObj", objsrt);
 }
+
 
 var compare = function(a, b) {
     var iA = a.name.first;
@@ -106,46 +107,45 @@ var addNewContactHandler = function(event) {
     var editBtn = document.querySelector(".edit-icon");
     var nameField = document.querySelector(".person_data p:nth-child(1)");
     var ageField = document.querySelector(".person_data p:nth-child(2)");
-    var telField = document.querySelector(".tel_container p");
-    var telContainer = document.querySelector(".tel_container");
-    var celField = document.querySelector(".wpp_container p");
-    var celContainer = document.querySelector(".wpp_container");
-    var emailField = document.querySelector(".mail_container p");
-    var emailContainer = document.querySelector(".mail_container");
+    var tellField = document.querySelector(".tell-container");
+    var cellField = document.querySelector(".cell-container");
+    var emailField = document.querySelector(".email-container");
     var addressField = document.querySelector(".local_container p");
     var deleteBtn = document.querySelector(".delete-icon");
 
-
     personPhoto.src = "assets/default-profile.svg";
     personContainer.classList.add("new-contact");
+    nameField.classList.add("newcontact")
+    ageField.classList.add("newcontact")
+    tellField.classList.add("newcontact");
+    cellField.classList.add("newcontact");
+    emailField.classList.add("newcontact");
+    addressField.classList.add("newcontact");
+
     newContactBtn.classList.add("active");
+
     editBtn.classList.remove("active");
     deleteBtn.classList.remove("active");
 
-    nameField.classList.add("newcontact");
-    ageField.classList.add("newcontact");
-    telContainer.classList.add("newcontact");
-    celContainer.classList.add("newcontact");
-    emailContainer.classList.add("newcontact");
-
     turnEditableContent(true);
 
-    nameField.innerHTML = "Nome";
-    ageField.innerHTML = "Data de Nascimento";
-    telField.innerHTML = "Telefone";
-    celField.innerHTML = "Celular";
-    emailField.innerHTML = "E-mail";
-    addressField.innerHTML = "Address";
+    nameField.innerHTML = "Insert name";
+    ageField.innerHTML = "Insert birthday (yyyy-mm)";
+    tellField.innerHTML = "Insert telefone";
+    cellField.innerHTML = "Insert celular";
+    emailField.innerHTML = "Insert e-mail";
+    addressField.innerHTML = "Insert address";
 
     nameField.addEventListener("keydown", newContactKeyDownHandler.bind(window, nameField, "name"));
     ageField.addEventListener("keydown", newContactKeyDownHandler.bind(window, ageField, "age"));
-    telField.addEventListener("keydown", newContactKeyDownHandler.bind(window, telField, "phone"));
-    celField.addEventListener("keydown", newContactKeyDownHandler.bind(window, celField, "cell"));
+    tellField.addEventListener("keydown", newContactKeyDownHandler.bind(window, tellField, "phone"));
+    cellField.addEventListener("keydown", newContactKeyDownHandler.bind(window, cellField, "cell"));
     emailField.addEventListener("keydown", newContactKeyDownHandler.bind(window, emailField, "email"));
     addressField.addEventListener("keydown", newContactKeyDownHandler.bind(window, addressField, "address"));
 }
 
 var newContactKeyDownHandler = function(field, property, event) {
+    // console.log(1)
     var tab = event.which === 9;
     if (times == 1) {
         field.innerHTML = " ";
@@ -159,7 +159,7 @@ var newContactKeyDownHandler = function(field, property, event) {
     var enter = event.which == 13;
     var esc = event.which == 27;
 
-    if (enter) {
+    if (enter || tab) {
         field.blur();
     } else if (esc) {
         document.execCommand('undo');
@@ -169,7 +169,7 @@ var newContactKeyDownHandler = function(field, property, event) {
     if (property == "name") {
         newName = event.target.innerHTML;
     } else if (property == "age") {
-        newBirthday = event.target.innerHTML;;
+        birthYear = event.target.innerHTML;;
     } else if (property == "phone") {
         newPhone = event.target.innerHTML;
     } else if (property == "cell") {
@@ -184,15 +184,11 @@ var newContactKeyDownHandler = function(field, property, event) {
 var cancelEventHandler = function(event) {
     var nameField = document.querySelector(".person_data p:nth-child(1)");
     var ageField = document.querySelector(".person_data p:nth-child(2)");
-    var telField = document.querySelector(".tel_container p");
-    var celField = document.querySelector(".wpp_container p");
-    var emailField = document.querySelector(".mail_container p");
-    var addressField = document.querySelector(".local_container p");
-
-    var telContainer = document.querySelector(".tel_container");
-    var celContainer = document.querySelector(".wpp_container");
-    var emailContainer = document.querySelector(".mail_container");
+    var emailField = document.querySelector(".email-container");
     var personContainer = document.querySelector(".person_container");
+    var tellField = document.querySelector(".tell-container");
+    var cellField = document.querySelector(".cell-container");
+    var addressField = document.querySelector(".local_container p");
 
     var editBtn = document.querySelector(".edit-icon");
     var newContactBtn = document.querySelector(".newcontact-btn");
@@ -200,37 +196,44 @@ var cancelEventHandler = function(event) {
 
     nameField.classList.remove("newcontact");
     ageField.classList.remove("newcontact");
+    tellField.classList.remove("newcontact");
+    cellField.classList.remove("newcontact");
+    emailField.classList.remove("newcontact")
+    addressField.classList.remove("newcontact");
 
     personContainer.classList.remove("new-contact");
-    telContainer.classList.remove("newcontact");
-    celContainer.classList.remove("newcontact");
-    emailContainer.classList.remove("newcontact");
 
     newContactBtn.classList.remove("active");
     editBtn.classList.add("active");
     deleteBtn.classList.add("active");
 
-    fillUser(contatoAtual);
+    fillUser(contatoAtual, false);
     turnEditableContent(false);
+
+    times = 1;
 };
 
 var saveEventHandler = function() {
     var nameField = document.querySelector(".person_data p:nth-child(1)");
     var ageField = document.querySelector(".person_data p:nth-child(2)");
-    var telContainer = document.querySelector(".tel_container");
-    var celContainer = document.querySelector(".wpp_container");
-    var emailContainer = document.querySelector(".mail_container");
+
+    var tellField = document.querySelector(".tell-container");
+    var cellField = document.querySelector(".cell-container");
+    var emailField = document.querySelector(".email-container");
+
     var editBtn = document.querySelector(".edit-icon");
     var personContainer = document.querySelector(".person_container");
     var newContactBtn = document.querySelector(".newcontact-btn");
     var currentYear = new Date().getFullYear();
+    birthYear = birthYear.toString();
     var addressField = document.querySelector(".local_container p");
+    var newAge =  ((currentYear - birthYear)-1);
 
     novoContato = {
         "name": {},
         "dob": {
-            "date": new Date(newBirthday),
-            "age": currentYear - newBirthday,
+            "date": birthYear,
+            "age": newAge,
         },
         "phone": newPhone,
         "cell": newCell,
@@ -241,21 +244,25 @@ var saveEventHandler = function() {
         }
     }
 
+    console.log(newAge, novoContato.age)    
+
     splitNamer(newName, novoContato);
 
     userData.push(novoContato);
     userData.sort(compare);
     eraseContactList();
     fillContactList(userData);
-    fillUser(novoContato);
+    fillUser(novoContato, false);
 
     personContainer.classList.remove("new-contact");
     newContactBtn.classList.remove("active");
+
     nameField.classList.remove("newcontact");
     ageField.classList.remove("newcontact");
-    telContainer.classList.remove("newcontact");
-    celContainer.classList.remove("newcontact");
-    emailContainer.classList.remove("newcontact");
+    tellField.classList.remove("newcontact");
+    cellField.classList.remove("newcontact");
+    emailField.classList.remove("newcontact")
+    addressField.classList.remove("newcontact")
 
     editBtn.classList.add("active");
     contatoAtual = userData[userData.length - 1];
@@ -272,7 +279,7 @@ var saveEventHandler = function() {
         turnEditableContent(false);
     }
 
-    userDataStr = JSON.stringify(userData);
+    var userDataStr = JSON.stringify(userData);
     localStorage.setItem("dataObj", userDataStr)
 };
 
@@ -287,25 +294,38 @@ var splitNamer = function(nameToSplit, obj) {
     }
 }
 
-var fillUser = function(data) { // funcao que puxa do JSON e preenche no HTML (parametro - base de dados)// 
+var fillUser = function(data, boolean) { // funcao que puxa do JSON e preenche no HTML (parametro - base de dados)// 
+    var personDataContainer = document.querySelector(".person_data");
+
     var nameField = document.querySelector(".person_data p:nth-child(1)");
     nameField.innerHTML = data.name.first + " " + data.name.last;
 
-    var birthDay = data.dob.date;
-    var birthYear = new Date(birthDay).getFullYear();
+    
+    birthYear = new Date(data.dob.date).getFullYear();
     var currentYear = new Date().getFullYear();
 
     var ageField = document.querySelector(".person_data p:nth-child(2)");
     ageField.innerHTML = (currentYear - birthYear) + " years";
 
-    var celField = document.querySelector(".wpp_container p");
-    celField.innerHTML = data.cell;
+    let telContainer = new ContactDataContainer('assets/tell.svg');
+    let celContainer = new ContactDataContainer('assets/wpp.svg');
+    let emailContainer = new ContactDataContainer('assets/arroba.svg');
 
-    var telField = document.querySelector(".tel_container p");
-    telField.innerHTML = data.phone;
+    if (boolean == true) {
+        personDataContainer.appendChild(telContainer)
+        telContainer.classList.add("tell-container")
 
-    var emailField = document.querySelector(".mail_container p");
-    emailField.innerHTML = data.email;
+        personDataContainer.appendChild(celContainer);
+        celContainer.classList.add("cell-container");
+
+        personDataContainer.appendChild(emailContainer);
+        emailContainer.classList.add("email-container");
+    }
+
+    document.querySelector(".email-container").innerHTML = data.email;
+
+    phoneMask(data.phone, document.querySelector(".tell-container"))
+    phoneMask(data.cell, document.querySelector(".cell-container"))
 
     var localField = document.querySelector(".local_container p");
     if (data.location.street == undefined) {
@@ -320,19 +340,17 @@ var fillUser = function(data) { // funcao que puxa do JSON e preenche no HTML (p
     var profileField = document.querySelector(".person_photo");
     profileField.src = data.picture.large;
 
-    phoneMask(data.phone, document.querySelector(".tel_container p"))
-    phoneMask(data.cell, document.querySelector(".wpp_container p"))
-
     contatoAtual = data;
 }
 
 var editClickEventHandler = function(event) {
+    alert("To save changes press enter, to cancel press Esc")
     turnEditableContent(true);
     var nameField = document.querySelector(".person_data p:nth-child(1)");
     var ageField = document.querySelector(".person_data p:nth-child(2)");
-    var telField = document.querySelector(".tel_container p");
-    var celField = document.querySelector(".wpp_container p");
-    var emailField = document.querySelector(".mail_container p");
+    var telField = document.querySelector(".tell-container");
+    var celField = document.querySelector(".cell-container");
+    var emailField = document.querySelector(".email-container");
     var addressField = document.querySelector(".local_container p");
 
     nameField.addEventListener("keydown", keydownEventHandler.bind(window, nameField, "name"));
@@ -349,9 +367,9 @@ var editClickEventHandler = function(event) {
 var turnEditableContent = function(boolean) {
     var nameField = document.querySelector(".person_data p:nth-child(1)");
     var ageField = document.querySelector(".person_data p:nth-child(2)");
-    var telField = document.querySelector(".tel_container p");
-    var celField = document.querySelector(".wpp_container p");
-    var emailField = document.querySelector(".mail_container p");
+    var telField = document.querySelector(".tell-container");
+    var celField = document.querySelector(".cell-container");
+    var emailField = document.querySelector(".email-container");
     var addressField = document.querySelector(".local_container p");
 
     nameField.contentEditable = boolean;
@@ -373,6 +391,8 @@ var keydownEventHandler = function(field, property, event) {
         editContent(property, contatoAtual, event);
         field.blur();
         eraseContactList();
+        userData = userData.sort(compare);
+        // put something here to reorganize by alphabetic order
         fillContactList(userData);
         initializeAPI(contatoAtual)
         turnEditableContent(false);
@@ -409,11 +429,15 @@ var phoneMask = function(number, field) {
     var numeroAtual = number;
     var numeroFormatado;
 
-    var onzeNum = number.length == 11;
-    var dezNum = number.length == 10;
-    var noveNum = number.length == 9;
-    var oitoNum = number.length == 8;
-    var seteNum = number.length == 7;
+    if (number == undefined) {
+        alert("Numero de telefone invalido");
+    } else {
+        var onzeNum = number.length == 11;
+        var dezNum = number.length == 10;
+        var noveNum = number.length == 9;
+        var oitoNum = number.length == 8;
+        var seteNum = number.length == 7;
+    }
 
     if (onzeNum) {
         const ddd = numeroAtual.slice(0, 2);
@@ -470,11 +494,12 @@ var searchEventHandler = function(event) {
 }
 
 var fillContactList = function(objs) {
-    var i;
-    for (i = 0; i < objs.length; i++) { // for que preenche cada um da lista//
-        let newItem = createNewContact(objs[i].name.first + " " + objs[i].name.last);
-        newItem.setAttribute("index", i);
-        newItem.addEventListener("click", itemClickHandler.bind(window, objs[i]));
+    let contactList = document.querySelector(".contact_list");
+    for (let i = 0; i < objs.length; i++) { // for que preenche cada um da lista//
+        let newContactItem = new ListItemContainer(objs[i]);
+        newContactItem.innerHTML = `${objs[i].name.first} ${objs[i].name.last}`;
+        newContactItem.addEventListener("click", itemClickHandler.bind(window, objs[i]))
+        contactList.appendChild(newContactItem);
     }
 }
 
@@ -487,7 +512,7 @@ var regExNumbers = function(objs) {
 
 var itemClickHandler = function(itemObj, event) {
     eraseContactList();
-    fillUser(itemObj)
+    fillUser(itemObj, false)
     initializeAPI(itemObj);
     swipeScreen(false);
 
@@ -498,28 +523,6 @@ var itemClickHandler = function(itemObj, event) {
     cancelEventHandler();
 }
 
-var createNewContact = function(name) { // cria containers pro contato na lista//
-    var contactList = document.querySelector(".contact_list");
-    var aLink = document.createElement("a");
-    contactList.appendChild(aLink);
-
-    var containerLetter = document.createElement("div");
-    containerLetter.classList.add("contact_initial");
-    var letter = name[0];
-    aLink.appendChild(containerLetter);
-    var contactLetter = document.createElement("p");
-    contactLetter.innerHTML = letter;
-    containerLetter.appendChild(contactLetter);
-
-    var containerName = document.createElement("div");
-    containerName.classList.add("contact_name");
-    aLink.appendChild(containerName);
-    var contactName = document.createElement("p");
-    contactName.innerHTML = name;
-    containerName.appendChild(contactName);
-
-    return aLink;
-}
 
 var swipeScreen = function(listScreen, event) { //Mobile - funcao pra mudar de uma tela pra outra//
     var contactScreen = document.querySelector(".window_container");
@@ -560,7 +563,7 @@ var inputChangeHandler = function(event) { // funcao pra filtrar os contatos //
 }
 
 var eraseContactList = function() { //funcao pra limpar os contatos pra filtrar//
-    var toRemove = document.querySelectorAll(".contact_list > a");
+    var toRemove = document.querySelectorAll(".contact_list > list-item-container");
     var removeContactContainer = document.querySelector(".contact_list");
 
     for (var j = 0; j < toRemove.length; j++) {
@@ -595,7 +598,7 @@ var initializeAPI = function(obj) { //new function to display my Map, that avoid
     const gmapApi = new GoogleMapsApi(); // initialize the api
     gmapApi.load().then(() => { // on api load do the following things
         let map = new google.maps.Map(document.querySelector('#map'), { // insert the map inside a div
-            zoom:18 // you must to set a zoom to display the map
+            zoom: 18 // you must to set a zoom to display the map
         });
 
         var formattedAddress; // variable to use a formatted address version
@@ -609,13 +612,13 @@ var initializeAPI = function(obj) { //new function to display my Map, that avoid
         geocoder.geocode({
             'address': formattedAddress // parameter that get the address
 
-        }, function(results, status) {         
-            let center = {                
-                lat:results[0].geometry.location.lat(), // current contact location 
-                lng:results[0].geometry.location.lng()
+        }, function(results, status) {
+            let center = {
+                lat: results[0].geometry.location.lat(), // current contact location 
+                lng: results[0].geometry.location.lng()
             }
             map.setCenter(center); // set the new center from the current contact
-            
+
             var marker = new google.maps.Marker({ // initialize a new market
                 position: center,
             });
@@ -633,7 +636,7 @@ var deleteClickHandler = function(event) {
         userData.splice(index, 1)
         var userDataStr = JSON.stringify(userData)
         localStorage.setItem("dataObj", userDataStr)
-        fillUser(userData[0]);
+        fillUser(userData[0], false);
         eraseContactList();
         fillContactList(userData);
     }
